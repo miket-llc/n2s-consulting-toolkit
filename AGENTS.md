@@ -6,11 +6,13 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Agent Team
 
-This repo ships with a team of eight specialized agents in `.claude/agents/`. Each one owns a specific surface of the prototype. Invoke an agent through the Agent tool with the matching `subagent_type`.
+This repo ships with a team of ten specialized agents in `.claude/agents/`. Each one owns a specific surface of the prototype. Invoke an agent through the Agent tool with the matching `subagent_type`.
 
 | Agent                        | Owns                                                       | Invoke for                                                                                |
 | ---------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | **chief-architect**          | Cross-cutting decisions, orchestration, release-readiness  | Architecture calls, scope, "what should we do here", or anything without a clearer owner  |
+| **product-manager**          | Scope, sequencing, prioritization, acceptance criteria     | "What next, in what order, and why" — backlog calls, sprint shaping, build-vs-don't-build |
+| **product-owner**            | Voice of the user (a working Ellucian consultant — Janet)  | Visceral reaction to a screen/flow, user-side scope vetoes, narrative acceptance          |
 | **lead-developer**           | TSX implementation, refactors, bug fixes                   | Building or fixing a screen, wiring components, removing dead code                        |
 | **ux-visionary**             | Visual quality, design tokens, themes, accessibility       | Hover/focus states, theme parity, chip/badge variants, density, type, color               |
 | **design-fidelity-guardian** | Pixel + copy parity vs the source design tarball           | Drift audits, new-component parity reviews, the May 15 scheduled audit                    |
@@ -18,6 +20,8 @@ This repo ships with a team of eight specialized agents in `.claude/agents/`. Ea
 | **test-engineer**            | Test stack and authorship                                  | Bootstrapping the test layer (none today), adding smoke/E2E tests                         |
 | **docs-leader**              | README, AGENTS.md, ADRs (when warranted)                   | Doc audits, fixing stale README, consolidating duplicates                                 |
 | **release-manager**          | Vercel deploys, version bumps, GitHub releases             | First-time linking, preview/prod deploys, release cuts, drift-audit pre-flight            |
+
+The flow for a typical change: **product-owner** reacts → **product-manager** scopes & sequences → **chief-architect** ratifies → **lead-developer** implements → **ux-visionary** polishes → **design-fidelity-guardian** audits → **release-manager** ships. Skip steps when the change is small.
 
 ## How to invoke
 
