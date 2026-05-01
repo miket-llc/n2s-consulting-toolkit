@@ -2,7 +2,7 @@
 
 Hi-fi clickable prototype of an internal toolkit for Ellucian consultants running ERP migration and modernization engagements at higher-ed institutions.
 
-The design was authored in [Claude Design](https://claude.ai/design) and exported as a self-contained React 18 + Babel-standalone SPA. This Next.js app hosts that prototype verbatim — see `public/proto/` — so the visual output matches the design pixel-for-pixel.
+State: prototype only. No backend, no auth, no persistence. Mock data lives in `lib/data.ts`.
 
 ## Run it
 
@@ -12,32 +12,45 @@ pnpm dev
 # open http://localhost:3000
 ```
 
-`/` redirects to `/proto/index.html`, where the prototype mounts itself.
+The app mounts at `app/page.tsx` (client component, hash-routed). Default route is `#project-home`.
+
+Other scripts: `pnpm build`, `pnpm start`.
 
 ## What's in here
 
-- `public/proto/` — the prototype: `index.html`, `styles.css`, `tokens.css`, mock data (`data.js`, `data-extra.js`), shared components (`icons.jsx`, `shell.jsx`, `tweaks-panel.jsx`), and per-route views (`views-*.jsx`).
-- `app/page.tsx` — server-side fallback redirect to the prototype.
-- `next.config.ts` — `redirects()` mapping `/` → `/proto/index.html`.
+- `app/page.tsx` — root client component. Owns route state (hash-routed), keyboard shortcuts, modal state (task / OC / capability / pattern / navigator / shortcuts / external-system drawer), and the Tweaks panel wiring.
+- `app/layout.tsx` — root layout, fonts, global styles.
+- `app/styles/` — global CSS (`styles.css`, tokens).
+- `components/shell.tsx` — `TopBar`, `Rail` (left nav), `AIAssistant` floating launcher, `Avatar`, `Sparkline`.
+- `components/views/` — per-route views, split across files:
+  - `views-1.tsx` — `MyWork`, `ProjectHome`, `Schedule`
+  - `views-2.tsx` — `Capabilities`, `SprintTasks`
+  - `views-3.tsx` — `Autopilot`, `InnerSource`, `Cockpit`
+  - `views-oc.tsx` — `OCGuide` (long-scroll / sidebar-TOC / two-pane layouts)
+  - `views-new.tsx` — `Documents`, `NavigatorOverlay`, `Methodology`, `SmartQueue`, `PathfinderIndex`, `CapabilityDetail`, `PatternDetail`, `ShortcutsCheatsheet`, `ExternalDrawer`
+  - `views-meta.tsx` — `ComponentsLib`, `NavSpec`
+- `components/icons.tsx` — inline SVG icon set.
+- `components/tweaks-panel.tsx` — runtime tweak knobs (`useTweaks` hook + `TweaksPanel`, `TweakSection`, `TweakRadio`, `TweakToggle`, `TweakButton`, etc.).
+- `lib/data.ts` — single mock dataset (engagement, members, sprints, tasks, OC content, capabilities, autopilot runs, documents, methodology, smart queue, etc.). All views read from here.
 
-## Highlights of the design
+## Routes
 
-- **Fixed three-tier left rail** — Cross-project (My Work · Smart Queue) → Project (Overview · Schedule · Capabilities · Tasks · Pathfinder · Configuration Autopilot · Documents) → Reference (Navigator · Methodology · Inner Source · Practice Cockpit).
-- **Top bar** — Project switcher chip, sprint + next-go-live schedule pill with burndown sparkline, theme toggle.
-- **OC Guide** with three switchable layouts (long scroll · sidebar TOC · two-pane).
-- **Configuration Autopilot** — agent run list with stage timeline, drift findings, and embedded Banner-form emulation.
-- **AI helpers** — N2S Copilot floating launcher, AI test-case generation, AI-summarized documents.
-- **Navigator (⌘K)** — global jump-to-anything search across capabilities, OCs, tasks, BPs, patterns, methodology.
-- **Tweaks panel** — runtime knobs for theme, density, OC layout, helper toggles, and quick-jump shortcuts.
-- **Hash routing** for deep links and refresh-stable URLs.
+Hash-routed via `app/page.tsx`. Routes: `project-home`, `my-work`, `smart-queue`, `navigator`, `schedule`, `capabilities`, `tasks`, `pathfinder`, `autopilot`, `documents`, `methodology`, `innersource`, `cockpit`, `components`, `navspec`. OC guides, capability detail, and pattern detail are overlay states on top of a route, not routes themselves.
 
 ## Keyboard shortcuts
 
-- `⌘K` / `/` — Navigator
-- `?` — Shortcuts cheatsheet
-- `t` — Toggle theme
-- `[` / `]` — Compact / comfortable density
-- `g h` Project Home, `g m` My Work, `g s` Smart Queue, `g a` Autopilot, `g c` Capabilities, `g d` Documents, `g i` Inner Source, `g x` Cockpit, `g l` Methodology, `g o` SOATERM OC guide
+Verified against `app/page.tsx:84–123`.
+
+- `⌘K` / `Ctrl-K` — toggle Navigator
+- `/` — open Navigator
+- `?` — toggle Shortcuts cheatsheet
+- `Esc` — close any open overlay (navigator, shortcuts, task, external drawer)
+- `t` — toggle theme (light / dark)
+- `[` — compact density
+- `]` — comfortable density
+- `g` then: `h` Project Home · `m` My Work · `s` Smart Queue · `a` Autopilot · `c` Capabilities · `d` Documents · `i` Inner Source · `x` Cockpit · `l` Methodology · `o` SOATERM OC guide
+
+Shortcuts are suppressed while typing in inputs / textareas / contenteditable, except `Esc`.
 
 ## Mock engagement
 
