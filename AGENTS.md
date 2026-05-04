@@ -36,3 +36,13 @@ Each agent has a memory directory at `.claude/agent-memory/<agent-name>/`. Insid
 ## Settings
 
 Bash and tool permissions live in `.claude/settings.local.json`.
+
+## Where the code lives (current sprint)
+
+The mounted surface is `components/v2/*` — `shell.tsx`, `practice.tsx`, `home.tsx`, `pages.tsx`, `icons.tsx` — wired from `app/page.tsx`. Styles in `app/styles/v2.css` (imports `tokens.css`).
+
+The legacy v1 surface (`components/views/*`, root-level `components/{shell,icons,tweaks-panel}.tsx`, `app/styles/styles.css`) is still in tree but **not mounted**. It is preserved as the parity reference for the May 15 drift audit, since the source-design tarball maps 1:1 to the legacy `views-*.jsx` files. The audit baseline for v2 is an open question — see README "Legacy v1" for context.
+
+## Smoke gate
+
+`pnpm smoke` runs `scripts/smoke.sh`: build + start + curl + assert key v2 markers in the rendered HTML. Use it as the local "is it broken" check; it is not a real test framework (no Vitest, no Playwright yet).

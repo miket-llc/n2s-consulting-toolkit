@@ -1,88 +1,46 @@
 # BACKLOG
 
-## State of play
+## State of play (2026-05-04)
 
-We are a 3-commit greenfield port of a Claude Design prototype to Next.js 16. Build is green; no Vercel project, no tests, no CI, README still describes the deleted `public/proto/` setup. Prime constraint is pixel parity with the source design; the only hard gate is the **May 15 drift audit at 9am ET** — anything that adds a new design surface before then is a liability.
+The repo has moved past the original Tier-0 BACKLOG. `app/page.tsx` now mounts the **v2 surface** (`components/v2/{shell,practice,home,pages,icons}.tsx`, styled by `app/styles/v2.css`). The legacy `components/views/*` and root-level `components/{shell,icons,tweaks-panel}.tsx` files remain in tree but are not imported anywhere mounted — they are preserved as the source-design parity reference until the May 15 drift-audit baseline is settled.
 
-## Tier 0 — Wire up what's already in the design
+Build is green (`pnpm next build`), dev server starts clean, smoke test passes (`pnpm smoke`).
 
-Existing UI wired only halfway. No new surfaces, no drift cost.
+This sprint's review→fix→test cycle landed:
 
-1. **Capabilities filter buttons** — `views-2.tsx:19,36–38` sets `filter` state but never applies it to `grouped`. Owner: `lead-developer`. **S**. Control renders, doesn't work.
-2. **Cockpit rows clickable** — `views-3.tsx:283` has `cursor: pointer` and copy says "click to drill in" but no `onClick`. Owner: `lead-developer`. **S**. False affordance.
-3. **Schedule lanes clickable** — `views-1.tsx:292` copy says "click any lane" but lanes have no handler. Owner: `lead-developer`. **S**. Same pattern.
-4. **"Open in Jira" / "Open in Smartsheet" buttons → ExternalDrawer** — `views-1.tsx:297`, `views-new.tsx:575`. Drawer is wired from Tweaks; in-page buttons are inert. Owner: `lead-developer`. **S**. Resolves Janet's real-vs-mock ambiguity.
-5. **Bell popover** — `shell.tsx:172` renders badge "3" with no panel. Owner: `lead-developer`. **S**. Minimal popover with three items mirroring `lib/data.ts` (DRCs, smart queue, autopilot finding).
-6. **Today line on Gantt** — `views-1.tsx:324` has the comment + empty wrapper. Owner: `lead-developer`. **S**. One absolutely-positioned div.
-7. **OC layout toggle in OC bar** — control exists in Tweaks (`page.tsx:175–181`); duplicate as a segmented control on the OC guide header. Owner: `lead-developer` w/ `design-fidelity-guardian` review. **S**. Tweaks is dev scaffolding; layout toggle is user-facing per the design's three-layout intent.
+- Replaced 7 `alert()` dialogs with a `notImplemented(message)` toast helper (`components/v2/shell.tsx`). Toast styled via new `.v2-toast-host` / `.v2-toast` rules in `v2.css`. The prototype is now demo-safe — no flinch on a client-shared screen.
+- Wired ⌘K / Ctrl-K to focus the topbar search input (was a kbd-hint lying about behaviour).
+- Fixed `OC_INDEX[*].id` and downstream references: `shrnpsn` → `nbrpsn` (matches the Banner form code, was a domain inconsistency `methodology-guru` flagged).
+- Added `aria-label` + `type="search"` to the search input.
+- Fixed the `Coming` placeholder's "Back to home" anchor (was `href="#"`, now `href="#/"`).
+- Bootstrapped a smoke gate: `scripts/smoke.sh` + `pnpm smoke` script.
+- Rewrote README to describe the v2 surface; refreshed AGENTS.md.
 
-## Tier 1 — Pre-audit hygiene (must land before May 15)
+## Open questions (need user signal)
 
-8. **README rewrite** — currently describes `public/proto/index.html` redirect that no longer exists. Owner: `docs-leader`. **M**. No design dependency. Highest priority — the repo currently misleads anyone landing on it.
-9. **Drift baseline pass** — `design-fidelity-guardian` walks every route against the source design, files a single tracked-issues list of visual deltas. Owner: `design-fidelity-guardian`. **M**. Gives the audit a known-state to diff against; surfaces fixes worth landing pre-audit.
-10. **Light-mode polish on rendered surfaces** — light theme is wired (`page.tsx:53`); confirm tokens don't regress. No new surfaces. Owner: `design-fidelity-guardian` flags, `lead-developer` fixes. **S–M**. Only fix what #9 flags.
-11. **Hide dev-only rail entries behind a flag** — `components`, `navspec` are meta routes. Add a `?dev=1` query gate so the audit doesn't treat them as primary. Owner: `lead-developer`. **S**.
+1. **May 15 drift-audit baseline.** The source-design tarball at `https://api.anthropic.com/v1/design/h/fIMotZmRLqVfGyaje-CA1g` maps 1:1 to the legacy `views-*.jsx` files. v2 has no source counterpart. Either re-export v2 from Claude Design and re-anchor the audit to the new baseline, or run the audit against legacy v1 (acknowledging that what runs is not what's audited). `chief-architect` recommends: re-export v2 first, then audit. Blocker is at the user's seat.
+2. **Legacy code removal.** Once the audit baseline is settled (per #1), `components/views/*`, `components/shell.tsx`, `components/icons.tsx`, `components/tweaks-panel.tsx`, `app/styles/styles.css` can be deleted in one commit (~2,400 lines). Don't delete pre-emptively.
 
-## Tier 2 — Cuts and de-prioritizations
+## Tier 0 — small, immediately useful
 
-- **Tweaks panel as user-facing surface** — *project decision, not a deletion*. Keep as design-time tool, gate visibility behind `?tweaks=1`. Janet is right consultants shouldn't see it; we still need it for demos and design QA.
-- **Methodology library top-rail entry** — *defer*. "Move under Resources" is a nav restructure; nav structure comes from the design. Bundle into v2 brief.
-- **Components / NavSpec rail entries** — *gate, don't delete* (Tier 1 #11).
-- **Recent Activity card on Project Home** — *leave*. Filler but pixel-faithful filler. Removing creates drift; replacing with real data is feature-ahead-of-design. v2.
-- **Duplicate sparkline** — *leave*. Header pill + sprint card is intentional and in design.
+1. **Wire the search input to data.** Today ⌘K focuses, but typing matches nothing. A simple in-memory match against PORTFOLIO + DRCS + OC_INDEX + WORKSHOPS would close the loop. **S–M**. Owner: `lead-developer`.
+2. **Real keyboard shortcuts.** Janet's v1 muscle memory was `g h`, `g d`, `g m`, etc. Re-introduce on top of v2 routes (`g p` → project, `g d` → decisions, `g w` → workshops, etc.). Add `?` to open a cheatsheet overlay. **S**. Owner: `lead-developer`.
+3. **DRC detail surface.** Today clicking a DRC shows a toast that "would open" it. The single biggest Janet-side gap (per `product-owner` review) is no per-decision context view. Could be a side drawer or a `#decisions/<id>` route. **M**. Owner: `lead-developer`, after `product-manager` scopes the IA.
 
-## Out of scope here — design-tool requests
+## Tier 1 — pre-audit hygiene
 
-Verified absent from `components/views/*`, so these are net-new features, not implementation gaps. Each is a real consulting need per Janet, but the right shop is `claude.ai/design` for a v2 design pass — not this team building ahead of spec.
+1. **Decide v2 vs v1 audit baseline** (see Open question #1). Blocks `design-fidelity-guardian`. Owner: user.
+2. **Vercel preview deploy.** No project linked. `release-manager` runs `vercel link` + first preview deploy so the user can share a URL. **S**.
+3. **Light-mode walk on v2.** Tokens cover both themes; visual walk needed. Owner: `ux-visionary` then `lead-developer` for any deltas. **S**.
 
-- **DRC inbox as first-class rail item.** DRC data exists scattered in `lib/data.ts`; no aggregated view. Convincing v2 ask.
-- **"You are here" presentation mode.** Hide Jira IDs, sync timestamps, internal chips for client screen-shares. Real need; net-new global mode needing design treatment.
-- **Workshop / session prep page.** Aggregator over DRCs, OC sections, test cases, attendees. Whole new page with new IA.
-- **Drift-vs-baseline diff view inside OC guide.** Autopilot finding → highlighted field in live preview. Significant new visualization.
-- **Gantt milestone markers, Autopilot drift-trend, OC cross-ref linking, DRC linkage in Documents, needs-my-signature filter, version history.** Bundle.
+## Tier 2 — explicitly deferred
 
-Action: `product-manager` drafts a single v2 design brief packaging these with Janet's justification; `ux-visionary` takes it into Claude Design.
+- **Vitest + Playwright** — not now. The smoke script (`pnpm smoke`) covers build + boot + render; framework install pends v2 stability and a real coverage target.
+- **OC Guide replacement in v2.** The legacy v1 had `OCGuide` (long-scroll / sidebar-TOC / two-pane). v2 has `Coming`-placeholders for it. This is the daily-tool gap Janet flagged but it is a v2-design surface that does not exist in the source tarball — needs a Claude Design pass before implementation. Owner: `ux-visionary` + `product-manager` to package as a v2 design brief.
+- **Inner Source surface.** `lib/data.ts` exports `INNER_SOURCE` (six patterns) but v2 doesn't render them. Either bring back a surface or drop the data. Defer to v2 design pass.
+- **`OC_DATA`, `SMART_QUEUE`, `DOC_TREE`, `DOCUMENTS`, `MILESTONES`, `GANTT_TODAY`, `MILESTONE_TYPES`, `FINDING_INDEX`, `ENGAGEMENT`, `ACTIVE_SPRINT`, `SPRINT_PLAN_BACKLOG`** — exported from `lib/data.ts`, unused by v2. Keep for now (zero runtime cost; possible reuse when v2 grows). Drop at the same time legacy code is removed if still unused.
 
-## Sequenced execution plan
+## Out of scope this sprint
 
-Run in order. **‖** = parallel with the line above.
-
-1. `docs-leader` — rewrite README (Tier 1 #8). M. No deps. **Start here.**
-2. `design-fidelity-guardian` — drift baseline walk (Tier 1 #9). M. ‖ with #1.
-3. `lead-developer` — Capabilities filter (Tier 0 #1). S. ‖ with #1, #2.
-4. `lead-developer` — Cockpit + Schedule row clickability (Tier 0 #2, #3). S.
-5. `lead-developer` — External-drawer button wiring (Tier 0 #4). S.
-6. `lead-developer` — Bell popover (Tier 0 #5). S.
-7. `lead-developer` — Today line on Gantt (Tier 0 #6). S.
-8. `design-fidelity-guardian` then `lead-developer` — OC layout toggle in OC bar (Tier 0 #7). S. After #2.
-9. `lead-developer` — dev-rail flag gate (Tier 1 #11). S. ‖ with #8.
-10. `lead-developer` — light-mode fixes from #2 list (Tier 1 #10). S–M. After #2.
-11. `product-manager` + `ux-visionary` — package v2 design brief. Async, doesn't block code.
-12. `release-manager` — May 14 pre-audit dry run.
-
-## Acceptance criteria for the next two items
-
-### Item 1 — Rewrite README (`docs-leader`)
-
-**Done when:**
-- README no longer mentions `public/proto/`, Babel-standalone, or `next.config.ts redirects`.
-- Run instructions accurate: `pnpm install && pnpm dev`, app served from `app/page.tsx`.
-- "What's in here" reflects actual structure: `app/`, `components/{views,shell,icons,tweaks-panel}`, `lib/data.ts`.
-- Keyboard shortcuts verified against `app/page.tsx:84–123`.
-- Mock engagement section retained verbatim — accurate.
-
-**Out of scope:** architecture diagrams, contributing guide, deployment instructions.
-
-### Item 2 — Drift baseline walk (`design-fidelity-guardian`)
-
-**Done when:**
-- A single file (`docs/drift-baseline-2026-05-01.md`) lists every visual delta, route by route, between the source design and the running implementation.
-- Each delta classified: `fix-now`, `accept` (design moved, we match newer intent), `defer`.
-- For each `fix-now`, the file/line is named.
-- Output is consumable by `lead-developer` without re-interpretation.
-
-**Out of scope:** light-mode regressions (Tier 1 #10 follow-up); new-feature recommendations (v2 brief); any change introducing a design surface not in the source.
-
-## What you're explicitly not doing
-
-We are not building a DRC inbox, presentation mode, workshop-prep page, drift-diff view, milestone markers, or any of Janet's other "to add" items this iteration — each is net-new design surface and the prime constraint is parity with the source before May 15. We are not deleting the Tweaks panel, Recent Activity card, duplicate sparkline, or Methodology rail entry — they're in the design and removing them creates drift we can't justify. We are not setting up Vercel, CI, or tests this sprint — none of that closes drift or unblocks the audit. Janet's signal is good and most of it lands in a v2 design brief; this sprint closes the gap between what the design says and what the implementation does.
+- New features: workshop prep aggregator, "you-are-here" presentation mode, drift-vs-baseline diff view inside an OC guide, Gantt milestone markers. All net-new design surface; route to v2 design brief.
+- Auth, persistence, real Jira/Smartsheet integration. Prototype-only.
