@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import "./styles/styles.css";
+import "./styles/v2.css";
 
 export const metadata: Metadata = {
   title: "Ellucian · Consulting Toolkit",
@@ -8,7 +8,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  width: 1440,
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -17,12 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com"/>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin=""/>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"/>
-      </head>
+    <html lang="en" className="theme-light" suppressHydrationWarning>
       <body suppressHydrationWarning>{children}</body>
     </html>
   );
