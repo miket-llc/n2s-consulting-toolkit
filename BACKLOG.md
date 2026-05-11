@@ -62,12 +62,22 @@ User answered all six load-bearing questions. **Three answers (Q1, Q3, Q6) clust
 
 chief-architect produced the replan; **`docs/MVP-PILOT-PLAN.md` §5–§14 is the live plan**. Headlines:
 
-- **Stack:** Clerk (auth) + Neon Postgres (DB) + Drizzle (ORM) + Vercel AI SDK + AI Gateway (LLM) + pgvector (RAG corpus). All via Vercel Marketplace; one-vendor secrets surface.
-- **Six sprints:** B0 cleanup (5/18) → B1 data layer (5/25) → B2 auth+scoping (6/8) → B3 mutations+cutover (6/22) → B4 AskPage RAG (7/6) → B5 content+rehearsal (7/20). **Pilot 2026-08-03.**
-- **Surviving Stance A items** (folded into B0): v1 archive cull, dead-export cull, drift fixes, focus pass, CSS cull, CI gate, Playwright bootstrap.
-- **Six open sub-questions** for user to answer (PLAN §13): persistence scope (mock vs real integration), LLM blast radius (chat vs action-taking), pilot date (8/3 default vs 7/20 aggressive), RAG corpus scope, user cap, rate limits.
+- **Stack:** Clerk (auth) + Neon Postgres (DB) + Drizzle (ORM) + Vercel AI SDK (LLM) + pgvector (RAG corpus). Each layer has a free dev-mode setup (no Vercel link required).
+- **Six sprints:** B0 cleanup (5/18) → B1 data layer (5/25) → B2 auth+scoping (6/8) → B3 mutations+cutover (6/22) → B4 AskPage RAG (7/6) → B5 content+rehearsal (7/20). **Pilot 2026-08-03 — IF hosting funding lands by ~2026-07-25; otherwise pilot slips while build proceeds locally.**
+- **Surviving Stance A items** (folded into B0): v1 archive cull, dead-export cull, drift fixes, focus pass, CSS cull, CI gate (now live via `.github/workflows/ci.yml`), Playwright bootstrap.
+- **Six open sub-questions** for user to answer (PLAN §13): persistence scope (mock vs real integration), LLM blast radius (chat vs action-taking), pilot date (8/3 default vs 7/20 aggressive), RAG corpus scope, ~~user cap~~ (Q5 now MOOT until hosting), rate limits.
 - **New agents recommended:** `platform-engineer` (NEW; owns Drizzle/API/Clerk/secrets/audit), `ai-architect` (formal addition to roster). docs-leader to update AGENTS.md.
 - **Reasoning trace** preserved in `.claude/agent-memory/chief-architect/project_stance_b_replan_2026_05_11.md`.
+
+### Vercel hosting — DEFERRED 2026-05-11 (late afternoon)
+
+User clarified Vercel deploys are deferred ("that's not free"). Focus until further notice is dev experience. Implications:
+
+- **No Vercel project linked, no preview/prod deploys.** Local `pnpm dev` (port 4321) + `pnpm smoke` + GitHub Actions CI is the contract.
+- **Stack still targets Vercel-friendly defaults** so deploy is a config flip, not a rewrite — see PLAN §5.1 "Pilot-time path" column.
+- **Marketplace install path** (Neon/Clerk/AI Gateway one-click) flips from Sprint A/B1/B2/B4 work into a single one-day "deploy preflight" when funding lands.
+- **PLAN §13 Q5 (user cap)** is moot until hosting exists.
+- **Pilot date 2026-08-03** holds only if hosting funds by ~2026-07-25.
 
 ## Sprint B (post-audit, May 18+) — OBSOLETE under Stance B
 

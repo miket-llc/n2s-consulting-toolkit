@@ -24,6 +24,8 @@ None of these are large. Together they are roughly **two sprints of disciplined 
 
 > **UPDATE 2026-05-11 (afternoon).** User overrode the recommendation and chose **Stance B** (prototype + real backend), with **>5 self-serve users** (engagement-scoped isolation now must-have) and **real LLM behind AskPage before pilot**. The recommendation in the paragraph above is preserved as historical context. §5 onward is obsolete pending chief-architect's Stance B replan. Sprint A pre-audit hygiene + the May 15 drift audit hold regardless of stance.
 
+> **UPDATE 2026-05-11 (late afternoon).** User clarified that **Vercel hosting is deferred — "that's not free"**. Focus until further notice is **dev experience** (devs being able to work on this locally + CI). The Stance B sprint sequence still proceeds (Drizzle + Neon + Clerk + AI SDK can all be developed against locally with free dev-tier accounts), but the Vercel Marketplace install path is gated behind future pilot funding. Q5 in §2 flips from "Vercel subdomain" to "deferred". The pilot date in §10 (2026-08-03) presumes hosting lands by then; if funding doesn't arrive, the pilot itself slips. See §5.1 / §5.3 / §13 below for stack and sequencing implications.
+
 ---
 
 ## 2. Open questions — RESOLVED 2026-05-11
@@ -36,7 +38,7 @@ User answered all six load-bearing questions on 2026-05-11 (afternoon). **Three 
 | Q2 | Pilot date | After May 15 | Audit fires on schedule. Late-May / early-June pilot date no longer realistic under Stance B; chief-architect to propose new calendar. |
 | Q3 | Pilot users | **>5 self-serve users** | Engagement-scoped isolation is now must-have (was R8 "document the constraint"). Auth + per-user persistence are in scope. |
 | Q4 | Re-anchor drift baseline | Yes — delete v1 archive post-audit | Sprint B1 (cull v1 archive ~3,841 lines) survives the replan. |
-| Q5 | Pilot URL | n2s-consulting-toolkit.vercel.app | Vercel still the deploy target. Marketplace add-ons (Postgres, auth, AI Gateway) available without leaving the platform. |
+| Q5 | Pilot URL | ~~`n2s-consulting-toolkit.vercel.app`~~ → **DEFERRED** (2026-05-11 PM, "that's not free") | No Vercel project linked, no preview/prod deploys until pilot is funded. Stack choices in §5.1 still target Vercel-friendly stack (Marketplace install is the easy on-ramp once funded). Local dev + CI smoke is the contract for now. |
 | Q6 | AskPage future | **Real LLM before pilot** | AskPage stub is no longer the pilot endpoint. lead-developer + ai-architect own the integration. Vercel AI SDK + AI Gateway are on the table. |
 
 Secondary questions still open — chief-architect to surface during replan:
@@ -103,33 +105,38 @@ The user picked: real backend, >5 self-serve users, real LLM behind AskPage. Tha
 
 ### 5.1 Stack choices (committed)
 
-| Layer | Choice | Rationale | Override flips |
-|---|---|---|---|
-| **Auth** | Clerk via Vercel Marketplace | Native Vercel one-click, env vars auto-provisioned, best React/Next.js ergonomics, free tier covers 10K MAU, SAML/OIDC ready when an Ellucian client wants SSO. Auth0 is heavier and the Vercel-native auth story is for Pro/Enterprise. | Auth0 if user wants org-managed RBAC out of the box; Vercel-native if user pays for Pro |
-| **DB** | Neon Postgres via Vercel Marketplace | Vercel-native default since 2026, true Postgres, branching for migrations, serverless-friendly cold-start. Supabase ships an opinionated SDK we don't need. | Supabase if user wants the storage + auth + functions stack in one vendor; raw Postgres on Render if Marketplace pricing balloons |
-| **ORM** | Drizzle | TypeScript-first (matches strict-mode discipline), ~7 KB runtime vs Prisma's heavyweight client, edge-compatible, schema-as-code. | Prisma if migrations get gnarly enough to want generated types + GUI |
-| **LLM client** | Vercel AI SDK + AI Gateway | Platform-native, model routing + cost tracking + provider failover free with Gateway, streaming React primitives ship in the SDK, model swap is a config change. | LangChain.js only if we need agent loops we don't have today |
-| **LLM model (default)** | Claude Sonnet 4.5 (or current Anthropic flagship) via Gateway | Best long-context grounded answers — exactly RAG-over-OC-content shape. Gateway lets us add OpenAI/Google as failover. | OpenAI gpt-4o if Gateway latency is unacceptable in a demo |
-| **Vector store** | Neon `pgvector` | Same DB, no second vendor, fine at OC-corpus scale (<10 MB embeddings). | Pinecone only if corpus grows past ~100 K chunks |
-| **Deploy** | Vercel — Functions for API routes, Marketplace for Neon + Clerk + AI Gateway, static prerender for any unauthenticated surface | Honors Q5 (`*.vercel.app`), keeps the platform single-vendor for the pilot, Marketplace add-ons mean no separate billing or vendor onboarding. | If we outgrow Functions (unlikely at pilot scale), Vercel's Fluid Compute upgrade is a config flip, not a rewrite |
-| **Secrets** | Vercel env vars (Marketplace add-ons auto-populate Neon + Clerk + AI Gateway keys) | One-vendor secrets = one auth surface to harden. | — |
-| **Persistence scope (this pilot)** | Per-user persistence of the existing `lib/data.ts` mock-data shape | Real Banner/Jira/Smartsheet integration is months of OAuth + schema reconciliation per institution. The pilot's job is to validate UX-shape, not replace live tooling. Real integrations are post-pilot. | If user picks real integrations, we add ~3 sprints (B-int1/B-int2/B-int3) before pilot — see §13 Q1 |
-| **AskPage scope (this pilot)** | RAG over OC content (read-only chat) | Action-taking LLM (sign DRCs, file Jira, draft config-field reviews) is a separate trust + auditability problem. Earned post-pilot. | If user picks action-taking, AskPage scope expands by ~1 sprint and we need a tool-use safety review — see §13 Q2 |
+> **Hosting note (2026-05-11 PM).** Vercel deploys are deferred per Q5 update. The stack choices below still target a Vercel-friendly path (so the eventual pilot deploy is a config flip, not a rewrite), but every layer now has a **dev-mode setup** that requires no Vercel link and no paid services. Marketplace integration moves to a future sprint gated on pilot funding. The "Dev mode (free)" column is what we use until then.
+
+| Layer | Choice | Dev mode (free, no Vercel) | Pilot-time path (when funded) | Override flips |
+|---|---|---|---|---|
+| **Auth** | Clerk | `@clerk/nextjs` with Clerk dev-instance keys (free tier, 10K MAU). Local dev sign-in works; sessions live in cookies. | Vercel Marketplace install auto-populates `CLERK_*` env vars; SAML/OIDC available for Ellucian SSO. | Auth0 (heavier) or NextAuth/Auth.js (own everything) — both still work in dev mode without Vercel. |
+| **DB** | Neon Postgres | Neon dev branch via `@neondatabase/serverless` HTTP driver and `DATABASE_URL` from Neon free tier (0.5 GB), OR local Docker postgres for offline work. | Vercel Marketplace install + branch-per-preview-deploy. | Supabase or raw Postgres on Render — same Drizzle schema, only the connection string changes. |
+| **ORM** | Drizzle | `drizzle-orm` + `drizzle-kit`; `pnpm db:migrate` + `pnpm db:seed` run locally against any Postgres URL. | Same. CI gates migrations. | Prisma if migrations get GUI-worthy. |
+| **LLM client** | Vercel AI SDK | `ai` + `@ai-sdk/anthropic` calling Anthropic API directly with a personal `ANTHROPIC_API_KEY`. No Gateway in dev mode → no failover, no cost dashboard, but functionally identical streaming. | AI Gateway flips on; provider failover + cost tracking arrive without code change (model swap is a config). | LangChain.js if we ever need agent loops. |
+| **LLM model (default)** | Claude Sonnet 4.5 (or current Anthropic flagship) | Direct Anthropic API. | Gateway-routed; OpenAI gpt-4o as failover. | OpenAI direct if Gateway latency hurts demo. |
+| **Vector store** | Neon `pgvector` | Same DB extension; works on Neon free tier and local Docker postgres. | Same. | Pinecone only if corpus grows past ~100 K chunks. |
+| **Deploy** | ~~Vercel~~ → **deferred** | Local `pnpm dev` (port 4321) + `pnpm smoke` + GitHub Actions CI on push/PR. Share via screen-share or screenshot. | Vercel Functions for API routes + Marketplace add-ons for Neon/Clerk/AI Gateway. Pilot funding gates this. | Render / Fly / Railway / self-host all work with the same Drizzle + Next.js shape if Vercel pricing shifts. |
+| **Secrets** | env vars | `.env.local` (gitignored). One vendor per key: Anthropic, Clerk, Neon. | Vercel project env vars with Marketplace auto-populate. | — |
+| **Persistence scope (this pilot)** | Per-user persistence of the existing `lib/data.ts` mock-data shape | Same. | Same. | Real integrations adds ~3 sprints — see §13 Q1. |
+| **AskPage scope (this pilot)** | RAG over OC content (read-only chat) | Same. | Same. | Action-taking adds ~1 sprint + safety RFC — see §13 Q2. |
 
 ### 5.2 Runtime shape
 
 - **Auth-aware Server Components** for every route except marketing surfaces (none today). `app/page.tsx` becomes a Server Component shell that awaits the Clerk session and routes the user to a sign-in view if unauthenticated. The current client-only hash router becomes a hybrid: Server Component data fetch → Client Component (`use client` for the existing v2 surface) for interaction.
-- **API routes** under `app/api/*` are Vercel Functions (Node runtime — Drizzle + pg are not edge-clean). Auth-gated via Clerk middleware.
+- **API routes** under `app/api/*` run on Node runtime (Drizzle + pg are not edge-clean). In dev mode they run via `pnpm dev`; pilot-time they become Vercel Functions. Auth-gated via Clerk middleware in either case.
 - **Hash routing stays.** It works, the v2 surface is built around it, and changing it is unrelated to the Stance B pivot. Auth state lives in Clerk's session cookie, not in the URL.
 - **`lib/data.ts` becomes a seed file**, not a runtime source. Read paths go through API routes that query Postgres. Mock data is the seed for new engagements; static catalogs (methodology, capabilities, OC index, inner-source patterns) are seeded once and never user-mutated.
 
-### 5.3 Marketplace install order (release-manager + new platform-engineer co-own)
+### 5.3 Local dev setup order (replaces Marketplace install order while Vercel is deferred)
 
-1. Vercel link the project (release-manager existing TODO).
-2. Install Neon from Marketplace → `DATABASE_URL` populated.
-3. Install Clerk from Marketplace → `CLERK_*` keys populated.
-4. Enable AI Gateway → `AI_GATEWAY_*` keys populated; configure default model + failover.
+1. **CI gate live** ✓ — `.github/workflows/ci.yml` runs `pnpm smoke` on push/PR. Branch protection on `main` requires linear history.
+2. Provision a **Neon dev branch** (free tier) → drop `DATABASE_URL` into `.env.local`. Optional: local Docker postgres for offline work — `docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=dev postgres:16-alpine`.
+3. Provision a **Clerk dev instance** (free tier) → drop `CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY` into `.env.local`. Add `localhost:4321` to allowed origins.
+4. Provision an **Anthropic API key** (or OpenAI key for failover) → drop into `.env.local` as `ANTHROPIC_API_KEY`.
 5. `pnpm add @clerk/nextjs drizzle-orm drizzle-kit @neondatabase/serverless @ai-sdk/anthropic ai`.
+6. Add `.env.example` (committed, no secrets) so onboarding is one `cp .env.example .env.local` + paste.
+
+**Pilot-time deploy** (when funded): re-instate the §5.3-prior install order — Vercel link → Neon Marketplace → Clerk Marketplace → AI Gateway → push. The dev-mode `.env.local` keys are simply replaced by Marketplace-auto-populated equivalents.
 
 ---
 
@@ -274,6 +281,8 @@ Every per-engagement query is gated by membership: `WHERE engagement_id IN (SELE
 Capacity reality: user + agent sessions, no new engineers. That dominates sequencing. Slices, not parallel streams. Six post-audit sprints (B0 → B5) after the in-flight Sprint A.
 
 Sizes XS / S / M / L. Owners use existing agents plus the new **platform-engineer** (see §11) and **ai-architect** (already in the available registry, formally added to roster in §11). `[shipped]` items are folded in from the obsolete Stance A plan and survive without scope change.
+
+> **Hosting deferral note (2026-05-11 PM).** Per Q5 update, every sprint item that requires "Install X from Vercel Marketplace", "Vercel link", "production preview URL", "AI Gateway provision", or "rehearsal on hosted URL" is **deferred until pilot is funded**. The equivalent dev-mode work (free-tier accounts → `.env.local` → local `pnpm dev`) proceeds on schedule per §5.1 / §5.3. When funding lands, those deferred items become a single one-day "deploy preflight" that flips Marketplace add-ons on and replaces the dev keys. The pilot date in §10 (2026-08-03) still holds **only if funding lands by ~2026-07-25**; otherwise the pilot itself slips while build work continues.
 
 ### Sprint A — pre-audit hygiene · 2026-05-11 → 2026-05-15 (in-flight)
 
@@ -557,7 +566,8 @@ These are the calls I deliberately surfaced rather than defaulted. Each has a re
 **What flips if user overrides:** ai-architect adds a "this OC has no detailed content yet — answer is from the OC index entry only" disclaimer in the prompt template. No extra sprint cost; honesty cost.
 
 ### Q5. Pilot user cap — hard limit in Clerk?
-**Why it matters:** Clerk free tier is 10K MAU; Neon free is 0.5 GB storage. Pilot is intended for >5 self-serve users (per Q3 answer). Without a cap, a pilot link forwarded to an enthusiast list could blow past free tier and rack up cost.
+**Status:** **MOOT until hosting is funded** (see §2 Q5 update — Vercel deferred). Re-evaluate when pilot URL exists.
+**Why it matters (when applicable):** Clerk free tier is 10K MAU; Neon free is 0.5 GB storage. Pilot is intended for >5 self-serve users (per Q3 answer). Without a cap, a pilot link forwarded to an enthusiast list could blow past free tier and rack up cost.
 **Recommendation:** **Hard-cap at 25 users** in Clerk's allowlist for the pilot window. Add via Clerk dashboard; release-manager provisions.
 **What flips if user overrides:** Higher cap → upgrade Clerk + Neon to paid tiers (~$25 + $19/mo each); product-manager owns the cost call.
 

@@ -4,6 +4,20 @@ All notable changes to the n2s-consulting-toolkit prototype are recorded here.
 Format roughly follows [Keep a Changelog](https://keepachangelog.com).
 Versions are semver-ish for a prototype (`0.x` is pre-pilot; `1.0` will be the first stable pilot cut).
 
+## [Unreleased] — 2026-05-11 (evening)
+
+Hosting deferral + dev-experience push. User clarified Vercel deploys are deferred until pilot is funded ("that's not free"). Focus shifts to dev experience: devs being able to work on this locally + CI catching breakage on push/PR.
+
+### Added
+- `.github/workflows/ci.yml` — runs `pnpm smoke` (build + start + curl + v2 marker assertions) on push to `main` and PRs targeting `main`. pnpm 10.30.3 + Node 22 LTS pinned, frozen-lockfile install, in-flight concurrency cancellation, 10-minute timeout. Closes Stance B sprint item B0-6 (CI gate) early.
+
+### Changed
+- `package.json` — added `packageManager: pnpm@10.30.3` and `engines: { node: ">=20" }`. `dev` script now binds to `127.0.0.1:4321` (was Next default `:3000` which collides with sibling projects); `start` script now uses `:4321` to match. New devs running `pnpm dev` land on the right port without checking the handoff.
+- `README.md` — fixed stale `localhost:3000` → `127.0.0.1:4321` in Run-it block; updated Tech section (pnpm pin + Node version + CI link); flipped tarball ID to the re-anchored `K3NKe3IuvfS03Mr6yWnkDw`; updated Legacy v1 section to reference Sprint B0 cull and the new design slice; added explicit "Hosting / deploy: deferred" note.
+- `docs/MVP-PILOT-PLAN.md` — added second §1 UPDATE banner for the hosting deferral; flipped §2 Q5 from "Vercel subdomain" to **DEFERRED**; rewrote §5.1 stack table to add a "Dev mode (free, no Vercel)" column alongside "Pilot-time path (when funded)" + override flips; replaced §5.3 "Marketplace install order" with "Local dev setup order" (Neon dev branch / Clerk dev instance / Anthropic key / `.env.local` / `.env.example`); added "Hosting deferral note" banner above §7 sprint replan flagging Vercel-dependent items as deferred; marked §13 Q5 (user cap) **MOOT until hosting**.
+- `docs/HANDOFF.md` — added a new "Hosting clarification" line to the status banner; added a "Repo state cheat sheet" section noting current tags / branch protection / CI / no Vercel project. Flagged the original "Deployment (when you're ready)" section as not applying.
+- `BACKLOG.md` — Stance B replan section updated with a "Vercel hosting — DEFERRED" sub-section. Stack line dropped "AI Gateway" mention (not used in dev mode).
+
 ## [Unreleased] — 2026-05-11 (late afternoon)
 
 Shell redesign + drift-audit baseline re-anchor to design tarball `K3NKe3IuvfS03Mr6yWnkDw`. New narrow violet TopBar (HEEAR-style) and relocated `ProjectSwitcher` per user direction in design `chat7.md`. Pre-audit UI change explicitly authorized by user; the May 13 EOD freeze still applies to all OTHER UI work.

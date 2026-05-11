@@ -13,11 +13,17 @@
 > - **Q3 → >5 self-serve users** (engagement-scoped isolation now must-have)
 > - **Q6 → Real LLM behind AskPage before pilot**
 >
-> The "Sprint B" / "Sprint C" / "Tone" / "Honest scope reminder" sections below describe the **obsolete Stance A plan**. They are preserved as historical context. **Do not act on them.** `chief-architect` produced the Stance B replan; **`docs/MVP-PILOT-PLAN.md` §5–§14 is now the live plan** (architecture, data model, six-sprint sequence B0→B5, pilot 2026-08-03, new `platform-engineer` agent recommended). Reasoning trace at `.claude/agent-memory/chief-architect/project_stance_b_replan_2026_05_11.md`. The May 15 drift audit + May 13 EOD freeze + Sprint A items already shipped are unaffected.
+> Then later the same afternoon a second design tarball (`K3NKe3IuvfS03Mr6yWnkDw`) landed — narrow violet TopBar + relocated `ProjectSwitcher` into a new `ProjectContextBar` strip — and was implemented same day per user direction. Audit baseline re-anchored to the new tarball.
 >
-> **What still applies from this handoff:** the doc-reading order at the top of "Paste this into a new session"; the running-locally section (port 4321, smoke gate); the "What's left for the user" interactive items (Vercel link, preview, prod, push tag, branch protect — Vercel still the deploy platform per Q5).
+> **Hosting clarification — 2026-05-11 PM (later).** User confirmed **Vercel deploys are deferred** until pilot is funded ("that's not free"). Focus is dev experience — devs being able to work on this locally + CI. Stack choices in PLAN §5.1 still target Vercel-friendly defaults but each layer has a free dev-mode setup; Marketplace install path is gated. CI ships via `.github/workflows/ci.yml` instead of preview deploys.
 >
-> **What does NOT apply:** Sprint B/C tables (rescoped); the "Single user (Janet)" tone bullet (multi-user is now scoped in); the "Honest scope reminder" Stance A claim.
+> The "Sprint B" / "Sprint C" / "Tone" / "Honest scope reminder" sections below describe the **obsolete Stance A plan**. They are preserved as historical context. **Do not act on them.** `chief-architect`'s Stance B replan in `docs/MVP-PILOT-PLAN.md` §5–§14 is the live plan. Reasoning trace at `.claude/agent-memory/chief-architect/project_stance_b_replan_2026_05_11.md`. The May 15 drift audit + May 13 EOD freeze (UI only; the K3NKe3Iu shell slice was a user-authorized exception) + Sprint A items already shipped are unaffected.
+>
+> **What still applies from this handoff:** the doc-reading order at the top of "Paste this into a new session"; the running-locally section (port 4321, smoke gate). The "What's left for the user" interactive items below are now **mostly resolved** — see "Repo state cheat sheet" below.
+>
+> **What does NOT apply:** Sprint B/C tables (rescoped); the "Single user (Janet)" tone bullet (multi-user is now scoped in); the "Honest scope reminder" Stance A claim; the "Deployment (when you're ready)" section (Vercel deferred per above — local dev + CI smoke is the contract for now).
+>
+> **Repo state cheat sheet (as of 2026-05-11 PM):** `main` is at HEAD, pushed to origin. Tag `v0.2.0-pre-audit.1` on origin. Branch protection on `main` set via `gh api` (linear history required, no force pushes, no deletions, dismiss stale reviews, PR-required count 0). GitHub Actions CI runs `pnpm smoke` on every push/PR. No Vercel project linked (deferred). The only pre-pilot interactive items left are: bump the PR-required count when collaborators land; provision the dev-tier Clerk/Neon/Anthropic accounts when starting Sprint B1 (per PLAN §5.3).
 
 ---
 

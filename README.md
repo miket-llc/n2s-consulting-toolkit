@@ -9,14 +9,16 @@ State: prototype only. No backend, no auth, no persistence (beyond `localStorage
 ```bash
 pnpm install
 pnpm dev
-# open http://localhost:3000
+# open http://127.0.0.1:4321
 ```
+
+`pnpm dev` binds to `127.0.0.1:4321` deliberately — port `3000` collides with sibling projects (`n2s-heear-editor`, `n2s-active-playbook`) and `0.0.0.0` would expose the dev server on the LAN. Use a different port only with the `--port` override and check the terminals/ folder for any colliding instance first.
 
 Other scripts:
 
 - `pnpm build` — production build (TypeScript strict + static prerender of `/`).
-- `pnpm start` — serve a built app on `:3000`.
-- `pnpm smoke` — run `scripts/smoke.sh`: build, start on `:3001`, curl the root URL, assert key v2 surface markers render. No browser, no test framework.
+- `pnpm start` — serve a built app on `:4321`.
+- `pnpm smoke` — run `scripts/smoke.sh`: build, start on `:3001`, curl the root URL, assert key v2 surface markers render. No browser, no test framework. Wired into GitHub Actions on push/PR — see [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 ## What's running today (the v2 surface)
 
@@ -105,15 +107,16 @@ The portfolio in `PORTFOLIO` includes 8 engagements; NSU is the default. Other e
 
 Earlier sprint built a different surface under `components/views/*`, `components/shell.tsx`, `components/icons.tsx`, and `components/tweaks-panel.tsx`. v2 replaced it. The legacy files are kept in tree because:
 
-1. The May 15 drift-audit baseline is the design tarball at `https://api.anthropic.com/v1/design/h/CgM4C5b7mEU63Y2RQISWcw`, which **does** ship `v2/*.jsx` as the active design. v2 in this port maps to `project/v2/*` in the tarball; the legacy `views-*.jsx` set lives under `project/v1-archive/` in the tarball and corresponds to the unmounted `components/views/*` here.
-2. Three surfaces shipped 2026-05-11 — MyWork kanban toggle, Schedule 12-month gantt, Configuration Guide config-fields table — are intentional toolkit-original additions with no tarball counterpart. They are documented at `.claude/agent-memory/design-fidelity-guardian/project_toolkit_original_additions.md` so the audit classifies them as intentional, not drift.
+1. The May 15 drift-audit baseline is the design tarball at `https://api.anthropic.com/v1/design/h/K3NKe3IuvfS03Mr6yWnkDw` (re-anchored 2026-05-11 PM from prior baseline `CgM4C5b7mEU63Y2RQISWcw`). It ships `v2/*.jsx` as the active design; v2 in this port maps to `project/v2/*` in the tarball, and the legacy `views-*.jsx` set under `project/v1-archive/` corresponds to the unmounted `components/views/*` here.
+2. Three surfaces shipped 2026-05-11 — MyWork kanban toggle, Schedule 12-month gantt, Configuration Guide config-fields table — plus the new `ProjectContextBar` + `ProjectIdentityChip` (2026-05-11 PM design slice) are intentional toolkit-original / design-driven additions. They are documented at `.claude/agent-memory/design-fidelity-guardian/project_toolkit_original_additions.md` and `reference_design_tarballs.md` so the audit classifies them correctly.
 
-When the audit baseline is re-anchored to v2-only (current default per [docs/MVP-PILOT-PLAN.md](docs/MVP-PILOT-PLAN.md) Q4), the legacy files (`components/views/*`, root-level `components/{shell,icons,tweaks-panel}.tsx`, `app/styles/styles.css` — ~3,800 lines total) can be removed in one commit. Until then, treat them as reference-only — do not import them from anywhere v2-mounted.
+The legacy files (`components/views/*`, root-level `components/{shell,icons,tweaks-panel}.tsx`, `app/styles/styles.css` — ~3,800 lines total) are queued for cull in Sprint B0 (post-audit). Until then, treat them as reference-only — do not import them from anywhere v2-mounted.
 
 ## Tech
 
 - Next.js 16.2 App Router with Turbopack.
 - React 19, TypeScript 5 strict.
-- pnpm. Vercel-ready (no project linked yet).
-- No CSS framework (no Tailwind, no UI kit). All styling is hand-authored CSS keyed to tokens in `tokens.css`.
+- pnpm 10.30 (pinned via `packageManager`). Node ≥20 (CI uses 22 LTS — see [`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
+- No CSS framework (no Tailwind, no UI kit). All styling is hand-authored CSS keyed to tokens in [`app/styles/tokens.css`](app/styles/tokens.css).
 - No state library — `useState`, `useEffect`, `useContext` only.
+- **Hosting / deploy: deferred.** No Vercel project linked, no preview/prod deploys until pilot is funded — see [`docs/MVP-PILOT-PLAN.md`](docs/MVP-PILOT-PLAN.md) §2 Q5 update. Local dev + CI smoke is the contract for now; share via screen-share or screenshot, not a hosted URL.
