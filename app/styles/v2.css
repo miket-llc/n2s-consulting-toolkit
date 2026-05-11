@@ -6,6 +6,7 @@
    ============================================================ */
 
 @import url("./tokens.css");
+@import url("./detail.css");
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -525,6 +526,7 @@ body { font-size: var(--fs-body); }
   margin-bottom: 28px;
   border-bottom: 1px solid var(--border);
 }
+.v2-hero-logo { flex: 0 0 auto; padding-top: 4px; }
 .v2-hero-text { max-width: 720px; min-width: 0; flex: 1; }
 .v2-hero-eyebrow { margin-bottom: 12px; }
 .v2-hero-sub { margin-top: 12px; font-size: var(--fs-body); color: var(--text-secondary); max-width: 620px; line-height: var(--lh-relaxed); }
@@ -819,8 +821,8 @@ body { font-size: var(--fs-body); }
   border-radius: var(--radius-lg);
   padding: 18px 20px;
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 14px;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
   align-items: start;
   transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
   text-align: left;
@@ -1564,4 +1566,352 @@ body { font-size: var(--fs-body); }
 @keyframes v2-toast-in {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   MyWork view toggle  (toolkit-original — kanban support)
+   ============================================================ */
+.v2-mywork-viewtoggle {
+  display: inline-flex;
+  gap: 4px;
+  margin-top: 4px;
+  margin-bottom: 16px;
+  padding: 4px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  width: fit-content;
+}
+.v2-mywork-viewtoggle button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font: 500 12px var(--font-sans);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 120ms, color 120ms;
+}
+.v2-mywork-viewtoggle button:hover { color: var(--text-primary); }
+.v2-mywork-viewtoggle button.is-active {
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* ============================================================
+   Kanban board view (5 status columns, no DnD)
+   ============================================================ */
+.v2-board {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .v2-board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .v2-board { grid-template-columns: 1fr; }
+}
+.v2-board-col {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 120px;
+}
+.v2-board-colhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px;
+}
+.v2-board-collabel {
+  font: 600 11px var(--font-sans);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.v2-board-colcount {
+  font: 500 11px var(--font-mono);
+  color: var(--text-ghost);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 8px;
+  min-width: 20px;
+  text-align: center;
+}
+.v2-board-empty {
+  font-size: 11px;
+  color: var(--text-ghost);
+  padding: 12px 4px;
+  text-align: center;
+  border: 1px dashed var(--border-subtle);
+  border-radius: 6px;
+}
+.v2-board-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.v2-board-card {
+  appearance: none;
+  text-align: left;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font: inherit;
+  color: inherit;
+  transition: border-color 120ms, transform 120ms;
+}
+.v2-board-card:hover {
+  border-color: var(--accent-border);
+  transform: translateY(-1px);
+}
+.v2-board-cardhead {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.v2-board-cardmarker {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+.v2-board-cardmarker.accent { background: var(--accent); }
+.v2-board-cardmarker.amber  { background: var(--amber);  }
+.v2-board-cardmarker.rose   { background: var(--rose);   }
+.v2-board-cardproject {
+  font: 500 10px var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+.v2-board-cardpriority {
+  margin-left: auto;
+  font: 500 10px var(--font-mono);
+  color: var(--text-ghost);
+  background: var(--bg-elevated);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+.v2-board-cardtitle {
+  font: 500 12.5px var(--font-sans);
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+.v2-board-cardfoot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-ghost);
+}
+
+/* ============================================================
+   Schedule gantt (toolkit-original — 12-month timeline)
+   Rows = go-lives. Cols = months. Dots = milestones.
+   ============================================================ */
+.v2-gantt-readiness {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+@media (max-width: 900px) {
+  .v2-gantt-readiness { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.v2-gantt-readinesscard {
+  appearance: none;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 120ms;
+}
+.v2-gantt-readinesscard:hover { border-color: var(--accent-border); }
+.v2-gantt-readinesshead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.v2-gantt-readinesslabel {
+  font: 600 13px var(--font-sans);
+  color: var(--text-primary);
+}
+.v2-gantt-readinessmeta {
+  display: flex;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-ghost);
+}
+.v2-gantt-readinessbar {
+  height: 6px;
+  background: var(--bg-elevated);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.v2-gantt-readinessbarfill { height: 100%; }
+.v2-gantt-readinessfoot {
+  display: flex;
+  justify-content: space-between;
+  font: 500 11px var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.v2-gantt {
+  display: grid;
+  grid-template-columns: 200px repeat(12, minmax(60px, 1fr));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  overflow: hidden;
+}
+.v2-gantt-header { display: contents; }
+.v2-gantt-cornercell,
+.v2-gantt-monthhead {
+  font: 600 10.5px var(--font-sans);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+.v2-gantt-monthhead {
+  text-align: center;
+  border-left: 1px solid var(--border-subtle);
+}
+.v2-gantt-cornercell { border-right: 1px solid var(--border); }
+
+.v2-gantt-row { display: contents; }
+.v2-gantt-rowlabel {
+  padding: 14px 10px;
+  border-top: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--border);
+  background: var(--bg-elevated);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.v2-gantt-rowname {
+  font: 600 12px var(--font-sans);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.v2-gantt-rowmeta {
+  font: 500 10.5px var(--font-mono);
+  color: var(--text-ghost);
+}
+.v2-gantt-cell {
+  position: relative;
+  min-height: 56px;
+  border-top: 1px solid var(--border-subtle);
+  border-left: 1px solid var(--border-subtle);
+}
+.v2-gantt-cell.is-today { background: var(--accent-glow); }
+.v2-gantt-today {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  pointer-events: none;
+  z-index: 1;
+}
+.v2-gantt-dot {
+  appearance: none;
+  border: 0;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: transform 120ms, box-shadow 120ms;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  color: white;
+  font: 700 10px var(--font-sans);
+}
+.v2-gantt-dot:hover {
+  transform: translate(-50%, -50%) scale(1.18);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+}
+.v2-gantt-dot.tone-cyan    { background: var(--cyan); }
+.v2-gantt-dot.tone-violet  { background: var(--violet);     color: var(--bg-panel); }
+.v2-gantt-dot.tone-rose    { background: var(--rose); }
+.v2-gantt-dot.tone-amber   { background: var(--amber);      color: var(--bg-panel); }
+.v2-gantt-dot.tone-ghost   { background: var(--text-ghost); }
+.v2-gantt-dot.tone-neutral { background: var(--text-ghost); }
+.v2-gantt-dotabbr { line-height: 1; }
+
+.v2-gantt-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+}
+.v2-gantt-legenditem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.v2-gantt-legendswatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 700 9.5px var(--font-sans);
+  color: white;
+}
+.v2-gantt-legendswatch.tone-cyan    { background: var(--cyan); }
+.v2-gantt-legendswatch.tone-violet  { background: var(--violet);     color: var(--bg-panel); }
+.v2-gantt-legendswatch.tone-rose    { background: var(--rose); }
+.v2-gantt-legendswatch.tone-amber   { background: var(--amber);      color: var(--bg-panel); }
+.v2-gantt-legendswatch.tone-ghost   { background: var(--text-ghost); }
+.v2-gantt-legendtoday {
+  display: inline-block;
+  width: 2px;
+  height: 16px;
+  background: var(--accent);
 }

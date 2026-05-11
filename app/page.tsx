@@ -11,6 +11,7 @@ import {
   MyWorkPage, DecisionsPage, WorkshopsPage, SchedulePage, CapabilitiesPage,
   MethodologyPage, AskPage, AutopilotPage, SettingsPage, GuidesPage,
 } from "@/components/v2/pages";
+import { CapabilityDetailPage, ConfigurationGuidePage } from "@/components/v2/detail";
 
 const LABELS: Record<string, string> = {
   mywork: "My work",
@@ -27,10 +28,14 @@ const LABELS: Record<string, string> = {
 
 function Router() {
   const [route] = useHash();
-  const top = route.split("/")[0].split("?")[0].split("#")[0];
+  const parts = route.split("?")[0].split("#")[0].split("/");
+  const top = parts[0];
+  const sub = parts[1];
 
   if (!top || top === "home") return <PracticeHome/>;
   if (top === "project") return <ProjectHome/>;
+  if (top === "capabilities" && sub) return <CapabilityDetailPage capId={sub}/>;
+  if (top === "guides" && sub)       return <ConfigurationGuidePage ocId={sub}/>;
 
   switch (top) {
     case "mywork":       return <MyWorkPage/>;

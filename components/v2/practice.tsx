@@ -5,7 +5,7 @@
 import * as React from "react";
 import { Icon } from "./icons";
 import {
-  useApp, useHash, PageHero, BriefBody, Section, ThreeThings, notImplemented,
+  useApp, useHash, PageHero, BriefBody, Section, ThreeThings, notImplemented, SchoolLogo,
 } from "./shell";
 import { composeBrief } from "@/lib/brief";
 import { TASKS } from "@/lib/data";
@@ -94,14 +94,14 @@ function ProjectCards() {
 
   type Seg = string | { em: "warn" | "good" | "bad"; text: string };
   const lines: Record<string, Seg[]> = {
-    "Northern State University": ["You're lead. Sprint 1 at ", { em: "good", text: "58%" }, ". Two ", { em: "warn", text: "client decisions to chase" }, " for Tuesday's demo."],
+    "Northern State University":   ["You're lead. Sprint 1 at ", { em: "good", text: "58%" }, ". Two ", { em: "warn", text: "client decisions to chase" }, " for Tuesday's demo."],
     "Western Illinois University": ["Stabilization, week 3. ", { em: "good", text: "Quiet" }, " — only 2 backlog tickets, both low severity."],
-    "CSU East Bay": [{ em: "warn", text: "Amber" }, ". Finance configuration ", { em: "warn", text: "31%" }, " against ", { em: "warn", text: "60% target" }, ". Vendor onboarding is the bottleneck."],
-    "Southwest Methodist": ["Discovery week 2. Workshops scheduled, no fires. Read-only — Cara is lead."],
-    "University of Vermont": [{ em: "warn", text: "Amber" }, ". Cross-functional review pending — read-only."],
-    "Brewer College": ["Read-only — Derek is lead."],
-    "St. Augustine State": ["Stabilization, ", { em: "good", text: "go-live in 6 days" }, ". On the watch list."],
-    "Coastline Community College": ["Build phase. Standard cadence. Read-only."],
+    "CSU East Bay":                [{ em: "warn", text: "Amber" }, ". Finance configuration ", { em: "warn", text: "31%" }, " against ", { em: "warn", text: "60% target" }, ". Vendor onboarding is the bottleneck."],
+    "University of South Carolina": ["Discovery week 2. Workshops scheduled, no fires. Read-only — Cara is lead."],
+    "University of Vermont":        [{ em: "warn", text: "Amber" }, ". Cross-functional review pending — read-only."],
+    "Lafayette College":            ["Read-only — Derek is lead."],
+    "Oakland University":           ["Stabilization, ", { em: "good", text: "go-live in 6 days" }, ". On the watch list."],
+    "Coastline Community College":  ["Build phase. Standard cadence. Read-only."],
   };
 
   return (
@@ -116,6 +116,7 @@ function ProjectCards() {
 
         return (
           <button key={p.id} className={cls} onClick={() => { setCurrentProjectId(p.id); navigate("project"); }}>
+            <SchoolLogo project={p} size={44} rounded="md"/>
             <div style={{ minWidth: 0 }}>
               <div className="v2-projcard-name">
                 {p.name}
@@ -187,6 +188,7 @@ function TodayAcross() {
 
 export function PracticeHome() {
   const { defaultLanding, setDefaultLanding } = useApp();
+  const [, navigate] = useHash();
   return (
     <>
       <PageHero
@@ -217,7 +219,7 @@ export function PracticeHome() {
       <Section
         eyebrow="Today, across everything"
         title="Working list"
-        action={<button className="btn-link" onClick={() => { window.location.hash = "mywork"; }}>Open My work →</button>}
+        action={<button className="btn-link" onClick={() => navigate("mywork")}>Open My work →</button>}
       >
         <TodayAcross/>
       </Section>

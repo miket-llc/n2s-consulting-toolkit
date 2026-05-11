@@ -117,12 +117,12 @@ export const OC_DATA = {
           num: 2, title: "Add parts-of-term records",
           body: "Use the SOATERM Parts of Term tab. Each row needs a unique sub-code, start/end dates that fall <strong>within</strong> the master term's window, and a census date. Save after each row to surface validation errors before they cascade.",
           fields: [
-            { field: "STVTERM_POT_CODE", value: "1",   why: "Standard full-term" },
-            { field: "POT 1 · weeks",    value: "16",  why: "Aug 24 – Dec 18" },
-            { field: "STVTERM_POT_CODE", value: "HA",  why: "Half-A mini-session" },
-            { field: "POT HA · weeks",   value: "8",   why: "Aug 24 – Oct 17" },
-            { field: "STVTERM_POT_CODE", value: "HB",  why: "Half-B mini-session" },
-            { field: "POT HB · weeks",   value: "8",   why: "Oct 19 – Dec 18" },
+            { field: "SOBPTRM_PTRM_CODE", value: "1",   why: "Standard full-term" },
+            { field: "POT 1 · weeks",     value: "16",  why: "Aug 24 – Dec 18" },
+            { field: "SOBPTRM_PTRM_CODE", value: "HA",  why: "Half-A mini-session" },
+            { field: "POT HA · weeks",    value: "8",   why: "Aug 24 – Oct 17" },
+            { field: "SOBPTRM_PTRM_CODE", value: "HB",  why: "Half-B mini-session" },
+            { field: "POT HB · weeks",    value: "8",   why: "Oct 19 – Dec 18" },
           ],
         },
       ],
@@ -249,18 +249,26 @@ export const INNER_SOURCE = [
   { id: "is-3", kind: "DRC",      title: "FA Award-Year DRC template",                  desc: "Pre-filled decision-required-from-client template for institutions whose FA processing year leads or lags acad-year. Used in 11 engagements, 100% acceptance.",                tags: ["faa", "drc", "template"],                 stars: 56,  used: 28, contributor: "Raj Kapoor",     engagement: "CSU EB · Promoted 2025" },
   { id: "is-4", kind: "Pattern",  title: "Position-control hierarchy v3",               desc: "Banner HR position-control structure adapted for SaaS Select tier — position-class and ECLS combinations validated against 18 institutions.",                                tags: ["hr", "position-control", "ecls"],         stars: 71,  used: 41, contributor: "Derek Liu",      engagement: "Multiple · Q1 2026" },
   { id: "is-5", kind: "Test pack", title: "SOATERM · Gherkin acceptance pack",          desc: "62 Gherkin-style acceptance criteria for term setup including edge cases (concurrent terms, summer minis, fiscal-year crossover). Drop-in for any Banner Select.",            tags: ["soaterm", "test", "gherkin"],             stars: 109, used: 54, contributor: "Janet Hawkins",  engagement: "NSU · In progress" },
-  { id: "is-6", kind: "Pattern",  title: "Vendor onboarding checklist",                 desc: "20-item AP onboarding checklist with Banner-specific vendor-class mapping and 1099 readiness. Promoted from Texas State 2025.",                                              tags: ["ap", "vendor", "1099"],                   stars: 38,  used: 19, contributor: "Cara Stein",     engagement: "TX State · Promoted 2025" },
+  { id: "is-6", kind: "Pattern",  title: "FTMVEND setup + 1099 readiness checklist",    desc: "20-item AP onboarding pack covering Banner FTMVEND vendor-class mapping, FTIIDEN cross-reference, and 1099 readiness audit. Promoted from Texas State 2025.",            tags: ["ap", "ftmvend", "vendor", "1099"],        stars: 38,  used: 19, contributor: "Raj Kapoor",     engagement: "TX State · Promoted 2025" },
 ];
 
 export const PORTFOLIO = [
-  { id: "p1",  name: "Northern State University",         product: "Banner SaaS",  tier: "Select",     phase: "Build",   nextGL: "May 24",  readiness: 78, sprint: "S1 · D4/10", health: "green" },
-  { id: "p2",  name: "Western Illinois University",       product: "Banner SaaS",  tier: "Select",     phase: "Stabilize", nextGL: "Aug 1",  readiness: 92, sprint: "S6 · D7/10", health: "green" },
-  { id: "p3",  name: "CSU East Bay",                      product: "Banner SaaS",  tier: "Essentials", phase: "Build",   nextGL: "Jun 15",  readiness: 41, sprint: "S3 · D2/10", health: "amber" },
-  { id: "p4",  name: "Southwest Methodist",               product: "Banner SaaS",  tier: "Advantage",  phase: "Discover", nextGL: "Sep 30", readiness: 18, sprint: "S0 · plan",  health: "green" },
-  { id: "p5",  name: "University of Vermont",             product: "Banner SaaS",  tier: "Select",     phase: "Build",   nextGL: "Jun 1",   readiness: 36, sprint: "S2 · D8/10", health: "amber" },
-  { id: "p6",  name: "Brewer College",                    product: "Colleague",    tier: "Select",     phase: "Build",   nextGL: "Jul 20",  readiness: 64, sprint: "S4 · D3/10", health: "green" },
-  { id: "p7",  name: "St. Augustine State",               product: "Banner SaaS",  tier: "Essentials", phase: "Stabilize", nextGL: "May 10", readiness: 88, sprint: "S5 · D9/10", health: "green" },
-  { id: "p8",  name: "Coastline Community College",       product: "Banner SaaS",  tier: "Select",     phase: "Build",   nextGL: "Aug 25",  readiness: 52, sprint: "S2 · D5/10", health: "green" },
+  { id: "p1",  name: "Northern State University",         short: "Northern State",  product: "Banner SaaS",  tier: "Select",     phase: "Build",     nextGL: "May 24",  readiness: 78, sprint: "S1 · D4/10", health: "green",
+    domain: "northern.edu",        logoUrl: "https://logo.clearbit.com/northern.edu",        logoColor: "#a32638", initials: "NS" },
+  { id: "p2",  name: "Western Illinois University",       short: "Western Illinois", product: "Banner SaaS",  tier: "Select",     phase: "Stabilize", nextGL: "Aug 1",   readiness: 92, sprint: "S6 · D7/10", health: "green",
+    domain: "wiu.edu",             logoUrl: "https://logo.clearbit.com/wiu.edu",             logoColor: "#4d2a7a", initials: "WIU" },
+  { id: "p3",  name: "CSU East Bay",                      short: "CSU East Bay",     product: "Banner SaaS",  tier: "Essentials", phase: "Build",     nextGL: "Jun 15",  readiness: 41, sprint: "S3 · D2/10", health: "amber",
+    domain: "csueastbay.edu",      logoUrl: "https://logo.clearbit.com/csueastbay.edu",      logoColor: "#b51e2a", initials: "CSU" },
+  { id: "p4",  name: "University of South Carolina",      short: "South Carolina",   product: "Banner SaaS",  tier: "Advantage",  phase: "Discover",  nextGL: "Sep 30",  readiness: 18, sprint: "S0 · plan",  health: "green",
+    domain: "sc.edu",              logoUrl: "https://logo.clearbit.com/sc.edu",              logoColor: "#73000a", initials: "SC" },
+  { id: "p5",  name: "University of Vermont",             short: "UVM",              product: "Banner SaaS",  tier: "Select",     phase: "Build",     nextGL: "Jun 1",   readiness: 36, sprint: "S2 · D8/10", health: "amber",
+    domain: "uvm.edu",             logoUrl: "https://logo.clearbit.com/uvm.edu",             logoColor: "#005f43", initials: "UVM" },
+  { id: "p6",  name: "Lafayette College",                 short: "Lafayette",        product: "Colleague",    tier: "Select",     phase: "Build",     nextGL: "Jul 20",  readiness: 64, sprint: "S4 · D3/10", health: "green",
+    domain: "lafayette.edu",       logoUrl: "https://logo.clearbit.com/lafayette.edu",       logoColor: "#640014", initials: "LC" },
+  { id: "p7",  name: "Oakland University",                short: "Oakland",          product: "Banner SaaS",  tier: "Essentials", phase: "Stabilize", nextGL: "May 10",  readiness: 88, sprint: "S5 · D9/10", health: "green",
+    domain: "oakland.edu",         logoUrl: "https://logo.clearbit.com/oakland.edu",         logoColor: "#000000", initials: "OU" },
+  { id: "p8",  name: "Coastline Community College",       short: "Coastline CC",     product: "Banner SaaS",  tier: "Select",     phase: "Build",     nextGL: "Aug 25",  readiness: 52, sprint: "S2 · D5/10", health: "green",
+    domain: "coastline.edu",       logoUrl: "https://logo.clearbit.com/coastline.edu",       logoColor: "#1d6fb8", initials: "CCC" },
 ];
 
 // ── data-extra ─────────────────────────────────────────────────────────────
@@ -345,10 +353,10 @@ export const OC_INDEX = [
   { id: "shacatq",  cap: "BC-CURRICULUM",   product: "Banner SaaS", code: "OC-2.4.3", title: "SHACATQ · Catalog Course Query",           owner: "mt", status: "in-review",   updated: "3d ago",  linkedTasks: 0 },
   { id: "ssasect",  cap: "BC-CURRICULUM",   product: "Banner SaaS", code: "OC-2.4.4", title: "SSASECT · Section Build & Cross-list",     owner: "mt", status: "draft",       updated: "Apr 28",  linkedTasks: 1 },
   { id: "stvattr",  cap: "BC-CURRICULUM",   product: "Banner SaaS", code: "OC-2.4.5", title: "STVATTR · Course Attributes",              owner: "mt", status: "approved",    updated: "Apr 22",  linkedTasks: 0 },
-  { id: "nbrpsn",   cap: "BC-HR-CORE",      product: "Banner SaaS", code: "OC-5.1.2", title: "NBRPSN · Position Definition",             owner: "dl", status: "approved",    updated: "Apr 18",  linkedTasks: 0 },
+  { id: "nbaposn",  cap: "BC-HR-CORE",      product: "Banner SaaS", code: "OC-5.1.2", title: "NBAPOSN · Position Definition",            owner: "dl", status: "approved",    updated: "Apr 18",  linkedTasks: 0 },
   { id: "ptrearn",  cap: "BC-PAYROLL",      product: "Banner SaaS", code: "OC-5.2.1", title: "PTREARN · Earn Code Setup",                owner: "dl", status: "in-review",   updated: "20m ago", linkedTasks: 1 },
   { id: "fgrgl",    cap: "BC-GL",           product: "Banner SaaS", code: "OC-4.1.1", title: "FGRGL · GL Account Structure",             owner: "rk", status: "draft",       updated: "Apr 25",  linkedTasks: 0 },
-  { id: "ftvvend",  cap: "BC-AP",           product: "Banner SaaS", code: "OC-4.2.1", title: "FTVVEND · Vendor Onboarding",              owner: "rk", status: "draft",       updated: "Apr 20",  linkedTasks: 0 },
+  { id: "ftmvend",  cap: "BC-AP",           product: "Banner SaaS", code: "OC-4.2.1", title: "FTMVEND · Vendor Onboarding",              owner: "rk", status: "draft",       updated: "Apr 20",  linkedTasks: 0 },
   { id: "rorprio",  cap: "BC-FAA",          product: "Banner SaaS", code: "OC-3.4.1", title: "RORPRIO · Award Priority Setup",           owner: "rk", status: "draft",       updated: "Apr 24",  linkedTasks: 1 },
   { id: "wdintegr", cap: "BC-INTEGRATIONS", product: "Banner SaaS", code: "OC-9.1.1", title: "Banner ↔ Workday Identity Bridge",         owner: "be", status: "draft",       updated: "Apr 25",  linkedTasks: 1 },
 ];
@@ -393,8 +401,8 @@ export const DRCS = [
     id: "DRC-4", code: "DRC-4",
     title: "FA proc-year offset — confirm 2627 = acad-year",
     capability: "BC-FAA", capabilityLabel: "Financial Aid Admin",
-    oc: "rorprio", ocCode: "OC-3.4.1", ocTitle: "RORPRIO · Award Priority Setup",
-    ocSection: "overview", fieldSelector: null,
+    oc: "soaterm", ocCode: "OC-2.4.1", ocTitle: "SOATERM · Term Code Configuration",
+    ocSection: "create", fieldSelector: "#fld-stvterm-fa",
     owner: "client-fa", ownerName: "M. Vasquez (FA Director)", ownerSide: "client",
     raised: "Apr 25", dueBy: "May 8", daysStale: 6, blockedCount: 2,
     severity: "med", status: "waiting-on-client",
@@ -415,7 +423,7 @@ export const DRCS = [
     id: "DRC-6", code: "DRC-6",
     title: "Position-class taxonomy — adopt Inner Source v3 as-is",
     capability: "BC-HR-CORE", capabilityLabel: "HR Core & Position",
-    oc: "nbrpsn", ocCode: "OC-5.1.2", ocTitle: "NBRPSN · Position Definition",
+    oc: "nbaposn", ocCode: "OC-5.1.2", ocTitle: "NBAPOSN · Position Definition",
     ocSection: "overview", fieldSelector: null,
     owner: "client-hr", ownerName: "T. Brooks (HRBP)", ownerSide: "client",
     raised: "Apr 30", dueBy: "May 14", daysStale: 1, blockedCount: 0,
@@ -437,7 +445,7 @@ export const DRCS = [
     id: "DRC-8", code: "DRC-8",
     title: "Vendor-class structure — reuse Inner Source AP onboarding pattern?",
     capability: "BC-AP", capabilityLabel: "Accounts Payable",
-    oc: "ftvvend", ocCode: "OC-4.2.1", ocTitle: "FTVVEND · Vendor Onboarding",
+    oc: "ftmvend", ocCode: "OC-4.2.1", ocTitle: "FTMVEND · Vendor Onboarding",
     ocSection: "overview", fieldSelector: null,
     owner: "client-finance", ownerName: "L. Chen (Controller)", ownerSide: "client",
     raised: "Apr 21", dueBy: "May 19", daysStale: 10, blockedCount: 1,
@@ -528,7 +536,7 @@ export const WORKSHOPS = [
       { name: "Derek L.", role: "Tech · HR/Payroll", initials: "DL", color: "#ffc94d" },
       { name: "Janet H.", role: "Lead Consultant", initials: "JH", color: "#3ecfff" },
     ],
-    scope: { drcs: ["DRC-6", "DRC-7"], ocs: ["nbrpsn", "ptrearn"], tests: [] as string[], docs: ["d5", "d12", "d13"] },
+    scope: { drcs: ["DRC-6", "DRC-7"], ocs: ["nbaposn", "ptrearn"], tests: [] as string[], docs: ["d5", "d12", "d13"] },
     agenda: [
       { t: "0:00", item: "Position-class hierarchy v3 walk" },
       { t: "0:20", item: "DRC-6 sign or override" },
@@ -554,7 +562,7 @@ export const WORKSHOPS = [
       { name: "L. Chen", role: "Controller (Client)", initials: "LC", color: "#ff86a8" },
       { name: "Raj K.", role: "Functional · Finance", initials: "RK", color: "#b49cff" },
     ],
-    scope: { drcs: ["DRC-8"], ocs: ["fgrgl", "ftvvend"], tests: [] as string[], docs: [] as string[] },
+    scope: { drcs: ["DRC-8"], ocs: ["fgrgl", "ftmvend"], tests: [] as string[], docs: [] as string[] },
     agenda: [] as Array<{ t: string; item: string }>,
     lastNotes: null,
   },
@@ -602,7 +610,27 @@ export const MILESTONES = [
   { id: "ms-18", goLive: "gl-s2",  type: "cutover",    monthCol: 10, dayInMonth: 14, date: "Mar 13–15", label: "Student P2 Cutover Weekend", owner: "MT" },
 ];
 
-export const GANTT_TODAY = { col: 0, dayInMonth: 1, date: "May 1, 2026", label: "Today · May 1" };
+// Compute today's position on the 12-month gantt that begins at May 2026.
+// Static prerender bakes this at build time; rebuild on Vercel updates it.
+function computeGanttToday(): { col: number; dayInMonth: number; date: string; label: string } {
+  const now = new Date();
+  const ganttStart = new Date(2026, 4, 1); // May 1, 2026 (month index 4)
+  const monthsDiff =
+    (now.getFullYear() - ganttStart.getFullYear()) * 12 +
+    (now.getMonth() - ganttStart.getMonth());
+  if (monthsDiff < 0 || monthsDiff > 11) {
+    return { col: 0, dayInMonth: 1, date: "—", label: "Today · outside gantt window" };
+  }
+  const monthName = now.toLocaleString("en-US", { month: "short" });
+  return {
+    col: monthsDiff,
+    dayInMonth: now.getDate(),
+    date: `${monthName} ${now.getDate()}, ${now.getFullYear()}`,
+    label: `Today · ${monthName} ${now.getDate()}`,
+  };
+}
+
+export const GANTT_TODAY = computeGanttToday();
 
 export const MILESTONE_TYPES: Record<string, { label: string; token: string; abbr: string }> = {
   workshop:   { label: "Workshop",       token: "cyan",    abbr: "W" },
@@ -613,9 +641,91 @@ export const MILESTONE_TYPES: Record<string, { label: string; token: string; abb
 };
 
 export const FINDING_INDEX: Record<string, { oc: string; section: string; fieldSelector: string | null; label: string; text: string }> = {
-  "DRC-2":   { oc: "soaterm", section: "pot",         fieldSelector: "#fld-stvterm-pot",   label: "Parts-of-term flag", text: "SOATERM 202610 part-of-term flag still NULL — DRC unresolved" },
-  "STVMAJR": { oc: "soaterm", section: "downstream",  fieldSelector: "#fld-stvterm-housing", label: "Housing-term flag", text: "47 records drift from baseline — 2 are NSU-specific majors (expected)" },
-  "STVRESD": { oc: "soaterm", section: "downstream",  fieldSelector: "#fld-stvterm-fa",     label: "FA proc-year",       text: "Display-order column unset on 4 rows" },
-  "STVATTR": { oc: "stvattr", section: "overview",    fieldSelector: "#fld-stvattr-att",    label: "STVATTR ATT codes",  text: "Course attributes ATT-INTL and ATT-HONORS referenced but not defined" },
-  "TC-7":    { oc: "soaterm", section: "validation",  fieldSelector: null,                  label: "Test case TC-7",     text: "test case TC-7 failed: birth-date-redaction in legacy export" },
+  "DRC-2":   { oc: "soaterm", section: "pot",         fieldSelector: "#fld-stvterm-pot",     label: "Parts-of-term flag",  text: "SOATERM 202610 part-of-term flag still NULL — DRC unresolved" },
+  "STVMAJR": { oc: "soaterm", section: "downstream",  fieldSelector: null,                   label: "STVMAJR · Major codes",     text: "47 records drift from baseline — 2 are NSU-specific majors (expected)" },
+  "STVRESD": { oc: "soaterm", section: "downstream",  fieldSelector: null,                   label: "STVRESD · Residency codes", text: "Display-order column unset on 4 rows" },
+  "STVATTR": { oc: "stvattr", section: "overview",    fieldSelector: "#fld-stvattr-att",     label: "STVATTR · Course attributes", text: "Course attributes ATT-INTL and ATT-HONORS referenced but not defined" },
+  "TC-7":    { oc: "soaterm", section: "validation",  fieldSelector: null,                   label: "Test case TC-7",      text: "test case TC-7 failed: birth-date-redaction in legacy export" },
+};
+
+// ── Task status (toolkit-original — kanban support) ───────────────────────
+// Mirrors the existing TASKS[].status string values. Used by the MyWorkPage
+// board view to render one column per status.
+
+export type TaskStatus = "Backlog" | "Ready" | "In Progress" | "Needs Review" | "Done";
+
+export const TASK_STATUSES: TaskStatus[] = [
+  "Backlog",
+  "Ready",
+  "In Progress",
+  "Needs Review",
+  "Done",
+];
+
+// ── Config fields (toolkit-original — Configuration Guide config-tasks) ──
+// Per-OC, per-section config-field rows surfaced inside the ConfigurationGuide
+// page as a two-state review table (unreviewed / confirmed). Only SOATERM is
+// populated; other OCs render an empty-state pill.
+
+export type ConfigField = {
+  id: string;
+  ocId: string;
+  sectionId: string;
+  fieldCode: string;        // mono token rendered as <code>
+  label: string;
+  recommendedValue: string;
+  notes?: string;
+};
+
+export const CONFIG_FIELDS_BY_OC: Record<string, Record<string, ConfigField[]>> = {
+  soaterm: {
+    overview: [
+      { id: "f-conv", ocId: "soaterm", sectionId: "overview",
+        fieldCode: "STVTERM_CODE.format", label: "Term-code format",
+        recommendedValue: "YYYYMM (Banner default)",
+        notes: "Inner-source pattern · 142 engagements. Custom formats break ~60% of pre-built reports." },
+    ],
+    create: [
+      { id: "f-term-code", ocId: "soaterm", sectionId: "create",
+        fieldCode: "STVTERM_CODE", label: "Term code",
+        recommendedValue: "202610",
+        notes: "Fall 2026 · YYYYMM convention" },
+      { id: "f-acyr", ocId: "soaterm", sectionId: "create",
+        fieldCode: "STVTERM_ACYR_CODE", label: "Academic-year code",
+        recommendedValue: "2627",
+        notes: "FY27 · should match FA proc-year unless DRC-4 confirms offset" },
+    ],
+    pot: [
+      { id: "f-pot-codes", ocId: "soaterm", sectionId: "pot",
+        fieldCode: "SOBPTRM_PTRM_CODE", label: "Parts-of-term layout",
+        recommendedValue: "1 · HA · HB (4-PoT block)",
+        notes: "PoT records live on SOBPTRM, one row per part-of-term. Half-A / Half-B awaiting DRC-2 sign-off." },
+      { id: "f-pot-census", ocId: "soaterm", sectionId: "pot",
+        fieldCode: "SOBPTRM_CENSUS_DATE", label: "Per-PoT census date",
+        recommendedValue: "Set per part-of-term",
+        notes: "Census date column on SOBPTRM. Without this, IPEDS reporting rolls only to master-term census." },
+    ],
+    "reg-windows": [
+      { id: "f-cohort", ocId: "soaterm", sectionId: "reg-windows",
+        fieldCode: "SFRRGCL_LEVL_CODE", label: "Cohort separation",
+        recommendedValue: "Split GR / UG",
+        notes: "DRC-3 open · graduate dean requesting separate priority window" },
+    ],
+    downstream: [
+      { id: "f-housing", ocId: "soaterm", sectionId: "downstream",
+        fieldCode: "STVTERM_HOUSING_IND", label: "Housing-term flag",
+        recommendedValue: "N (activate last)",
+        notes: "Activating early opens room-billing detail codes prematurely" },
+      { id: "f-fa-flag", ocId: "soaterm", sectionId: "downstream",
+        fieldCode: "STVTERM_FA_PROC_IND", label: "FA processing flag",
+        recommendedValue: "Y",
+        notes: "Must equal acad-year unless cycle is offset" },
+    ],
+    validation: [
+      { id: "f-autopilot", ocId: "soaterm", sectionId: "validation",
+        fieldCode: "AUTOPILOT_BASELINE", label: "Autopilot baseline check",
+        recommendedValue: "Run after every save",
+        notes: "Run #284 · 12 cases · 11 pass · 1 skip" },
+    ],
+  },
 };

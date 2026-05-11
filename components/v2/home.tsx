@@ -6,7 +6,7 @@ import * as React from "react";
 import { useState, useMemo } from "react";
 import { Icon, IconName } from "./icons";
 import {
-  useApp, useHash, PageHero, BriefBody, Section,
+  useApp, useHash, PageHero, BriefBody, Section, SchoolLogo,
 } from "./shell";
 import { composeBrief } from "@/lib/brief";
 import {
@@ -34,7 +34,7 @@ function ProjectBrief() {
         <div className="v2-brief-meta">
           <span>Composed {brief.time} · {brief.date}</span>
           <span>·</span>
-          <span>Pulled from Jira, Smartsheet, the autopilot run feed, and standup notes.</span>
+          <span>Demo data — will pull from Jira, Smartsheet, the autopilot feed, and standup notes when wired.</span>
         </div>
       </div>
       <div className="v2-brief-aside">
@@ -520,6 +520,7 @@ export function HomePage() {
   return (
     <>
       <PageHero
+        logo={currentProject && <SchoolLogo project={currentProject} size={56} rounded="lg"/>}
         eyebrow={`Project · ${currentProject?.product || "Banner SaaS"} · ${currentProject?.tier || ""}`}
         headline={currentProject?.name || "Project"}
         sub={`${currentProject?.phase || "Build"} phase · ${currentProject?.sprint || "Sprint 1"} · ${currentProject?.readiness || 78}% ready · next go-live ${currentProject?.nextGL || ""}`}

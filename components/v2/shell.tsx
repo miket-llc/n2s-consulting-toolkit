@@ -7,6 +7,7 @@ import * as React from "react";
 import { useState, useEffect, useRef, useCallback, useContext, createContext } from "react";
 import { Icon, IconName } from "./icons";
 import { PORTFOLIO, DRCS } from "@/lib/data";
+import { SCHOOL_BRANDS, SCHOOL_BRAND_FONT_STACK } from "@/lib/school-brands";
 import type { BriefFragment } from "@/lib/brief";
 
 // ── Toast (prototype-stub feedback, replaces alert dialogs) ──────────────
@@ -82,23 +83,33 @@ const AppContext = createContext<AppCtx | null>(null);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const portfolio = PORTFOLIO;
 
-  const [currentProjectId, setCurrentProjectIdState] = useState<string>(() => {
-    if (typeof window === "undefined") return portfolio[0].id;
-    return localStorage.getItem("v2.currentProject") || portfolio[0].id;
-  });
-  const [defaultLanding, setDefaultLandingState] = useState<DefaultLanding>(() => {
-    if (typeof window === "undefined") return "practice";
-    return (localStorage.getItem("v2.defaultLanding") as DefaultLanding) || "practice";
-  });
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === "undefined") return "light";
-    return (localStorage.getItem("v2.theme") as Theme) || "light";
-  });
+  // SSR and first client render must agree, so initial state is the deterministic
+  // default. localStorage is read post-mount in the effect below.
+  const [currentProjectId, setCurrentProjectIdState] = useState<string>(portfolio[0].id);
+  const [defaultLanding, setDefaultLandingState] = useState<DefaultLanding>("practice");
+  const [theme, setThemeState] = useState<Theme>("light");
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    const storedProject = localStorage.getItem("v2.currentProject");
+    if (storedProject && portfolio.some(p => p.id === storedProject)) {
+      setCurrentProjectIdState(storedProject);
+    }
+    const storedLanding = localStorage.getItem("v2.defaultLanding") as DefaultLanding | null;
+    if (storedLanding === "practice" || storedLanding === "project") {
+      setDefaultLandingState(storedLanding);
+    }
+    const storedTheme = localStorage.getItem("v2.theme") as Theme | null;
+    if (storedTheme === "light" || storedTheme === "dark") {
+      setThemeState(storedTheme);
+    }
+    setHydrated(true);
+  }, [portfolio]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("theme-light", theme === "light");
-    localStorage.setItem("v2.theme", theme);
-  }, [theme]);
+    if (hydrated) localStorage.setItem("v2.theme", theme);
+  }, [theme, hydrated]);
 
   const setCurrentProjectId = useCallback((id: string) => {
     setCurrentProjectIdState(id);
@@ -143,6 +154,126 @@ function EllucianWordmark() {
   );
 }
 
+// ── SchoolLogo ────────────────────────────────────────────────────────────────
+// Visual anchor for an engagement. Resolution order:
+//   1. project.logoUrl — curated override, always wins.
+//   2. Clearbit Logo API (via project.domain) — 2.5s timeout before fallback.
+//   3. Monogram — initials in school-specific brand font + color.
+//
+// Outer box is always the same size so there is no layout shift between layers.
+
+type SchoolLogoProps = {
+  project: Project;
+  size: number;
+  rounded?: "sm" | "md" | "lg";
+};
+
+export function SchoolLogo({ project, size, rounded = "md" }: SchoolLogoProps) {
+  // null = pending Clearbit load, true = loaded, false = failed/timed out
+  const [clearbitState, setClearbitState] = useState<boolean | null>(
+    project.logoUrl ? null : false
+  );
+
+  useEffect(() => {
+    if (!project.logoUrl) return;
+    // Reset state when project changes
+    setClearbitState(null);
+
+    const img = new Image();
+    const timer = window.setTimeout(() => {
+      setClearbitState(prev => (prev === null ? false : prev));
+    }, 2500);
+
+    img.onload = () => {
+      window.clearTimeout(timer);
+      setClearbitState(true);
+    };
+    img.onerror = () => {
+      window.clearTimeout(timer);
+      setClearbitState(false);
+    };
+    img.src = project.logoUrl;
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [project.logoUrl]);
+
+  const borderRadius =
+    rounded === "lg" ? Math.round(size * 0.22) + "px" :
+    rounded === "sm" ? "4px" : "6px";
+
+  const brand = SCHOOL_BRANDS[project.id] ?? null;
+  const fontStack = brand
+    ? (SCHOOL_BRAND_FONT_STACK[brand.font] ?? "var(--font-sans)")
+    : "var(--font-sans)";
+  const isItalic = brand?.font === "serif-italic";
+  const isSerif  = brand?.font === "serif" || brand?.font === "serif-italic" || brand?.font === "slab";
+  const monoBg   = brand?.bg ?? project.logoColor ?? "var(--accent)";
+  const monoFg   = brand?.fg ?? "#ffffff";
+  const monoWeight   = brand?.weight   ?? 800;
+  const monoTracking = brand?.tracking ?? "-0.04em";
+
+  // Derive initials: prefer project.initials, else auto from short/name.
+  const init = (
+    project.initials ||
+    (project.short || project.name || "?")
+      .split(/\s+/)
+      .map((w: string) => w[0])
+      .join("")
+      .slice(0, 3)
+  ).toUpperCase();
+
+  // Font size scales with char count and serif/sans distinction.
+  const sizeMul =
+    init.length >= 3 ? (isSerif ? 0.40 : 0.38) :
+    init.length === 2 ? (isSerif ? 0.54 : 0.52) :
+    0.62;
+  const fontSize = Math.max(10, Math.round(size * sizeMul));
+
+  const showClearbit = project.logoUrl && clearbitState === true;
+  const showMonogram = !showClearbit;
+
+  const boxStyle: React.CSSProperties = {
+    position: "relative",
+    width: size,
+    height: size,
+    borderRadius,
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flex: "0 0 auto",
+    overflow: "hidden",
+    background: showMonogram ? monoBg : "var(--bg-elevated)",
+    border: showMonogram ? "none" : "1px solid var(--border-subtle)",
+    color: monoFg,
+    fontWeight: monoWeight,
+    fontStyle: isItalic ? "italic" : "normal",
+    fontSize,
+    letterSpacing: monoTracking,
+    fontFamily: fontStack,
+    lineHeight: 1,
+  };
+
+  return (
+    <span className="v2-schoollogo" style={boxStyle} aria-label={project.name} title={project.name}>
+      {showClearbit ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={project.logoUrl}
+          alt=""
+          style={{ width: "100%", height: "100%", objectFit: "contain", display: "block", padding: Math.round(size * 0.08) }}
+          loading="lazy"
+        />
+      ) : (
+        <span style={{ position: "relative", zIndex: 1, display: "inline-flex", alignItems: "center", lineHeight: 1 }}>
+          {init}
+        </span>
+      )}
+    </span>
+  );
+}
+
 // ── Project switcher ──────────────────────────────────────────────────────
 function ProjectSwitcher() {
   const { portfolio, currentProject, setCurrentProjectId } = useApp();
@@ -173,6 +304,7 @@ function ProjectSwitcher() {
         aria-expanded={open}
         title="Switch engagement"
       >
+        <SchoolLogo project={currentProject} size={22} rounded="sm"/>
         <span className="v2-projswitch-context">Project</span>
         <span className="v2-projswitch-name">{currentProject.name}</span>
         <span className="v2-projswitch-meta internals-inline">
@@ -357,11 +489,13 @@ export function PageShell({ children }: { children: React.ReactNode }) {
 }
 
 // ── Hero ──────────────────────────────────────────────────────────────────
-export function PageHero({ eyebrow, headline, sub, actions }: {
-  eyebrow?: React.ReactNode; headline: React.ReactNode; sub?: React.ReactNode; actions?: React.ReactNode;
+export function PageHero({ eyebrow, headline, sub, actions, logo }: {
+  eyebrow?: React.ReactNode; headline: React.ReactNode; sub?: React.ReactNode;
+  actions?: React.ReactNode; logo?: React.ReactNode;
 }) {
   return (
     <header className="v2-hero">
+      {logo && <div className="v2-hero-logo">{logo}</div>}
       <div className="v2-hero-text">
         {eyebrow && <div className="t-eyebrow v2-hero-eyebrow">{eyebrow}</div>}
         <h1 className="t-h1">{headline}</h1>

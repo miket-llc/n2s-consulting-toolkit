@@ -3,7 +3,7 @@
 // Toolkit v2 — secondary destinations.
 
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "./icons";
 import {
   useApp, useHash, PageHero, Section, notImplemented,
@@ -11,34 +11,37 @@ import {
 import {
   TASKS, DRCS, WORKSHOPS, GO_LIVES, BUSINESS_CAPABILITIES,
   METHODOLOGY_PHASES, METHODOLOGY_CARDS, OC_INDEX, AUTOPILOT_RUNS,
+  MILESTONES, GANTT_TODAY, MILESTONE_TYPES, TASK_STATUSES,
 } from "@/lib/data";
 
 // ── MY WORK ──────────────────────────────────────────────────────────────
-export function MyWorkPage() {
-  const [, navigate] = useHash();
-  const tasks = TASKS.filter(t => t.assignee === "jh" || !t.assignee);
+type Task = typeof TASKS[number];
+type MyWorkView = "buckets" | "board";
 
+function useMyWorkView(): [MyWorkView, (v: MyWorkView) => void] {
+  const [view, setView] = useState<MyWorkView>("buckets");
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("v2.mywork.view");
+      if (stored === "buckets" || stored === "board") setView(stored);
+    } catch {}
+  }, []);
+  const apply = (v: MyWorkView) => {
+    setView(v);
+    try { localStorage.setItem("v2.mywork.view", v); } catch {}
+  };
+  return [view, apply];
+}
+
+function MyWorkBuckets({ tasks }: { tasks: Task[] }) {
   const buckets = [
-    { id: "today",     label: "Today",        match: (t: typeof TASKS[number]) => t.dueRel === "today" },
-    { id: "tomorrow",  label: "Tomorrow",     match: (t: typeof TASKS[number]) => t.dueRel === "tomorrow" },
-    { id: "this-week", label: "This week",    match: (t: typeof TASKS[number]) => t.dueRel === "this-week" },
-    { id: "later",     label: "Later",        match: (t: typeof TASKS[number]) => t.dueRel === "later" || !t.dueRel },
+    { id: "today",     label: "Today",     match: (t: Task) => t.dueRel === "today" },
+    { id: "tomorrow",  label: "Tomorrow",  match: (t: Task) => t.dueRel === "tomorrow" },
+    { id: "this-week", label: "This week", match: (t: Task) => t.dueRel === "this-week" },
+    { id: "later",     label: "Later",     match: (t: Task) => t.dueRel === "later" || !t.dueRel },
   ];
-
   return (
     <>
-      <PageHero
-        eyebrow="My work"
-        headline="Your queue across every engagement"
-        sub="Smart-ranked: P1 + urgent first, then by due date. Cross-engagement; click any row to open the source ticket."
-        actions={
-          <button className="btn btn-secondary btn-sm" onClick={() => navigate("")}>
-            <Icon name="grid" size={13}/>
-            <span>Portfolio</span>
-          </button>
-        }
-      />
-
       {buckets.map(b => {
         const items = tasks.filter(b.match);
         if (items.length === 0) return null;
@@ -71,6 +74,99 @@ export function MyWorkPage() {
           </Section>
         );
       })}
+    </>
+  );
+}
+
+function MyWorkBoard({ tasks }: { tasks: Task[] }) {
+  const columns = TASK_STATUSES.map(status => ({
+    status,
+    items: tasks.filter(t => t.status === status),
+  }));
+
+  return (
+    <div className="v2-board" role="list" aria-label="Tasks by status">
+      {columns.map(col => (
+        <div key={col.status} className="v2-board-col" role="listitem">
+          <div className="v2-board-colhead">
+            <span className="v2-board-collabel">{col.status}</span>
+            <span className="v2-board-colcount">{col.items.length}</span>
+          </div>
+          {col.items.length === 0 ? (
+            <div className="v2-board-empty">No items</div>
+          ) : (
+            <div className="v2-board-cards">
+              {col.items.map(t => {
+                const tone = t.urgent ? "rose" : col.status === "Needs Review" ? "amber" : "accent";
+                return (
+                  <button
+                    key={t.id}
+                    className="v2-board-card"
+                    onClick={() => notImplemented(`Would open ${t.jiraId} in Jira`)}
+                  >
+                    <div className="v2-board-cardhead">
+                      <span className={`v2-board-cardmarker ${tone}`}/>
+                      <span className="v2-board-cardproject">{t.project}</span>
+                      <span className="v2-board-cardpriority">{t.priority}</span>
+                    </div>
+                    <div className="v2-board-cardtitle">{t.title}</div>
+                    <div className="v2-board-cardfoot">
+                      <span className="t-mono">{t.jiraId}</span>
+                      <span>·</span>
+                      <span>{t.due}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function MyWorkPage() {
+  const [, navigate] = useHash();
+  const [view, setView] = useMyWorkView();
+  const tasks = TASKS.filter(t => t.assignee === "jh" || !t.assignee);
+
+  return (
+    <>
+      <PageHero
+        eyebrow="My work"
+        headline="Your queue across every engagement"
+        sub="Smart-ranked: P1 + urgent first, then by due date. Cross-engagement; click any row to open the source ticket."
+        actions={
+          <button className="btn btn-secondary btn-sm" onClick={() => navigate("")}>
+            <Icon name="grid" size={13}/>
+            <span>Portfolio</span>
+          </button>
+        }
+      />
+
+      <div className="v2-mywork-viewtoggle" role="tablist" aria-label="My work view">
+        <button
+          role="tab"
+          aria-selected={view === "buckets"}
+          className={view === "buckets" ? "is-active" : ""}
+          onClick={() => setView("buckets")}
+        >
+          <Icon name="list" size={12}/>
+          <span>Buckets</span>
+        </button>
+        <button
+          role="tab"
+          aria-selected={view === "board"}
+          className={view === "board" ? "is-active" : ""}
+          onClick={() => setView("board")}
+        >
+          <Icon name="grid" size={12}/>
+          <span>Board</span>
+        </button>
+      </div>
+
+      {view === "buckets" ? <MyWorkBuckets tasks={tasks}/> : <MyWorkBoard tasks={tasks}/>}
     </>
   );
 }
@@ -184,62 +280,150 @@ export function WorkshopsPage() {
 }
 
 // ── SCHEDULE ─────────────────────────────────────────────────────────────
+// Twelve-month swimlane gantt anchored at GANTT_TODAY (May 2026). Rows are
+// go-lives in chronological order; columns are months; milestone dots are
+// positioned by monthCol/dayInMonth and colored by MILESTONE_TYPES.token.
+
+const GANTT_MONTHS = [
+  "May 26", "Jun 26", "Jul 26", "Aug 26", "Sep 26", "Oct 26",
+  "Nov 26", "Dec 26", "Jan 27", "Feb 27", "Mar 27", "Apr 27",
+];
+
 export function SchedulePage() {
+  const [, navigate] = useHash();
   const gls = [...GO_LIVES].sort((a, b) => a.daysOut - b.daysOut);
 
   return (
     <>
       <PageHero
         eyebrow="Schedule"
-        headline="Go-lives ahead"
-        sub="Each milestone shows readiness against scope. Click into a go-live to see the capability swimlanes."
+        headline="Twelve months ahead"
+        sub="Go-live readiness above; milestones across the swimlane below. Workshops, freezes, cutovers, training, and change-control submissions."
       />
 
-      <div className="stack gap-3">
+      <div className="v2-gantt-readiness">
         {gls.map(gl => {
           const tone = gl.status === "at-risk" ? "rose" : gl.status === "scoping" ? "amber" : "accent";
-          const cls = ["v2-projcard",
-            gl.status === "at-risk" ? "v2-projcard-bad" : "",
-            gl.status === "scoping" ? "v2-projcard-attn" : ""].filter(Boolean).join(" ");
+          const pillTone = tone === "accent" ? "neutral" : tone;
           return (
-            <button key={gl.id} className={cls} onClick={() => notImplemented(`Would open go-live · ${gl.label}`)}>
-              <div style={{ minWidth: 0 }}>
-                <div className="v2-projcard-name">{gl.label}</div>
-                <div className="v2-projcard-meta">
-                  <span>{gl.product}</span>
-                  <span>·</span>
-                  <span>{gl.date}</span>
-                  <span>·</span>
-                  <span>in {gl.daysOut} days</span>
-                  <span>·</span>
-                  <span>covers {gl.scope.length} capabilities</span>
-                </div>
-                <div className="v2-projcard-line" style={{ marginTop: 12 }}>
-                  <div style={{ display: "flex", height: 6, background: "var(--bg-elevated)", borderRadius: 4, overflow: "hidden" }}>
-                    <div style={{
-                      width: `${gl.readiness}%`,
-                      background: gl.status === "at-risk" ? "var(--rose)" : gl.status === "scoping" ? "var(--amber)" : "var(--accent)",
-                    }}/>
-                  </div>
-                </div>
-              </div>
-              <div className="v2-projcard-stat">
-                <span className={`pill pill-${tone === "rose" ? "rose" : tone === "amber" ? "amber" : "neutral"} pill-dot`}>
+            <button
+              key={gl.id}
+              className="v2-gantt-readinesscard"
+              onClick={() => notImplemented(`Would open go-live · ${gl.label}`)}
+            >
+              <div className="v2-gantt-readinesshead">
+                <span className="v2-gantt-readinesslabel">{gl.label}</span>
+                <span className={`pill pill-${pillTone} pill-dot`}>
                   {gl.status === "on-track" ? "On track" : gl.status === "at-risk" ? "At risk" : "Scoping"}
                 </span>
-                <div className="v2-projcard-readiness">{gl.readiness}%</div>
-                <div className="t-meta">{`Next: ${gl.date}`}</div>
+              </div>
+              <div className="v2-gantt-readinessmeta">
+                <span>{gl.product}</span>
+                <span>·</span>
+                <span>{gl.date}</span>
+                <span>·</span>
+                <span>in {gl.daysOut}d</span>
+              </div>
+              <div className="v2-gantt-readinessbar">
+                <div
+                  className="v2-gantt-readinessbarfill"
+                  style={{
+                    width: `${gl.readiness}%`,
+                    background: gl.status === "at-risk" ? "var(--rose)" : gl.status === "scoping" ? "var(--amber)" : "var(--accent)",
+                  }}
+                />
+              </div>
+              <div className="v2-gantt-readinessfoot">
+                <span>{gl.readiness}% ready</span>
+                <span>{gl.scope.length} capabilities</span>
               </div>
             </button>
           );
         })}
       </div>
+
+      <Section eyebrow="Roadmap" title="12-month milestone gantt">
+        <div className="v2-gantt" role="grid" aria-label="Milestones by go-live and month">
+          <div className="v2-gantt-header" role="row">
+            <div className="v2-gantt-cornercell">Go-live</div>
+            {GANTT_MONTHS.map((m, i) => (
+              <div key={i} className="v2-gantt-monthhead" role="columnheader">{m}</div>
+            ))}
+          </div>
+
+          {gls.map(gl => {
+            const items = MILESTONES.filter(m => m.goLive === gl.id);
+            return (
+              <div key={gl.id} className="v2-gantt-row" role="row">
+                <div className="v2-gantt-rowlabel">
+                  <span className="v2-gantt-rowname">{gl.label}</span>
+                  <span className="v2-gantt-rowmeta">{gl.date}</span>
+                </div>
+                {GANTT_MONTHS.map((_, monthIdx) => {
+                  const inMonth = items.filter(m => m.monthCol === monthIdx);
+                  const isTodayCol = monthIdx === GANTT_TODAY.col;
+                  return (
+                    <div
+                      key={monthIdx}
+                      className={`v2-gantt-cell ${isTodayCol ? "is-today" : ""}`}
+                      role="gridcell"
+                    >
+                      {isTodayCol && (
+                        <span
+                          className="v2-gantt-today"
+                          style={{ left: `${(GANTT_TODAY.dayInMonth / 31) * 100}%` }}
+                          aria-label={GANTT_TODAY.label}
+                        />
+                      )}
+                      {inMonth.map(m => {
+                        const type = MILESTONE_TYPES[m.type];
+                        return (
+                          <button
+                            key={m.id}
+                            type="button"
+                            className={`v2-gantt-dot tone-${type?.token || "neutral"}`}
+                            style={{ left: `${(m.dayInMonth / 31) * 100}%` }}
+                            title={`${m.date} · ${type?.label} · ${m.label}`}
+                            onClick={() => {
+                              if (m.type === "workshop") {
+                                navigate("workshops");
+                              } else {
+                                notImplemented(`${m.date} · ${type?.label} · ${m.label}`);
+                              }
+                            }}
+                          >
+                            <span className="v2-gantt-dotabbr">{type?.abbr}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="v2-gantt-legend">
+          {Object.entries(MILESTONE_TYPES).map(([key, t]) => (
+            <span key={key} className="v2-gantt-legenditem">
+              <span className={`v2-gantt-legendswatch tone-${t.token}`}>{t.abbr}</span>
+              <span>{t.label}</span>
+            </span>
+          ))}
+          <span className="v2-gantt-legenditem">
+            <span className="v2-gantt-legendtoday"/>
+            <span>{GANTT_TODAY.label}</span>
+          </span>
+        </div>
+      </Section>
     </>
   );
 }
 
 // ── CAPABILITIES ─────────────────────────────────────────────────────────
 export function CapabilitiesPage() {
+  const [, navigate] = useHash();
   const caps = BUSINESS_CAPABILITIES;
   const areas = ["Student", "Finance", "HR", "Cross"];
 
@@ -258,7 +442,7 @@ export function CapabilitiesPage() {
           <Section key={area} eyebrow={area} title={`${items.length} capabilities`}>
             <div className="v2-cap-grid">
               {items.map(bc => (
-                <button key={bc.id} className="v2-cap-card" onClick={() => notImplemented(`Would open capability · ${bc.label}`)}>
+                <button key={bc.id} className="v2-cap-card" onClick={() => navigate(`capabilities/${bc.id}`)}>
                   <div className="v2-cap-head">
                     <span className="v2-cap-name">{bc.label}</span>
                     <span className="v2-cap-area">{bc.goLive}</span>
@@ -326,8 +510,9 @@ export function MethodologyPage() {
 }
 
 // ── ASK THE ASSISTANT ────────────────────────────────────────────────────
+// Pilot stance: this page is honest about being unwired. No disabled-button
+// trap, no fake textarea. The shape is what it will be when the LLM lands.
 export function AskPage() {
-  const [q, setQ] = useState("");
   const suggestions = [
     "What's blocking the NSU Sprint 1 demo?",
     "Summarize all open client decisions older than 5 days.",
@@ -338,45 +523,53 @@ export function AskPage() {
   return (
     <>
       <PageHero
-        eyebrow="Assistant"
+        eyebrow="Assistant · coming soon"
         headline="Ask anything about your portfolio"
-        sub="Grounded in your live engagement data — Jira, Smartsheet, autopilot runs, and standup notes."
+        sub="A grounded assistant over your live engagement data — Jira, Smartsheet, Autopilot runs, standup notes. Not wired yet for this pilot."
       />
       <div className="v2-brief">
         <div style={{ flex: 1 }}>
-          <textarea
-            placeholder="e.g. Which decisions should I chase today?"
-            value={q}
-            onChange={e => setQ(e.target.value)}
-            rows={3}
+          <div
             style={{
-              width: "100%",
-              padding: 14,
-              border: "1px solid var(--border)",
+              padding: 16,
+              border: "1px dashed var(--border)",
               borderRadius: 8,
-              fontFamily: "inherit",
-              fontSize: "var(--fs-body)",
-              resize: "vertical",
               background: "var(--bg-elevated)",
-              color: "var(--text-primary)",
+              color: "var(--text-secondary)",
+              fontSize: "var(--fs-body)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
             }}
-          />
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--text-primary)", fontWeight: 600 }}>
+              <Icon name="info" size={14}/>
+              <span>Coming soon</span>
+            </div>
+            <p style={{ margin: 0, lineHeight: 1.5 }}>
+              The grounded assistant lands in a later pilot increment. The
+              questions below are the kinds of things it will answer — citing
+              the underlying records (DRCs, Autopilot runs, tasks) rather than
+              hallucinating.
+            </p>
+          </div>
           <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
-            <div className="t-eyebrow">Try</div>
+            <div className="t-eyebrow">Questions the assistant will answer</div>
             {suggestions.map(s => (
-              <button key={s} className="btn btn-ghost btn-sm" style={{ justifyContent: "flex-start" }} onClick={() => setQ(s)}>
-                <Icon name="ai" size={13}/>
-                <span>{s}</span>
-              </button>
+              <div key={s} className="v2-row" style={{ cursor: "default" }}>
+                <span className="v2-row-marker accent"/>
+                <div style={{ minWidth: 0 }}>
+                  <div className="v2-row-title">{s}</div>
+                </div>
+                <span className="pill pill-neutral">preview</span>
+              </div>
             ))}
           </div>
         </div>
         <div className="v2-brief-aside">
-          <button className="btn btn-primary" disabled={!q}>
-            <Icon name="ai" size={14}/>
-            <span>Ask</span>
-          </button>
-          <div className="v2-brief-asidefoot">replies cite source records</div>
+          <div className="v2-brief-asidefoot">
+            Replies will cite source records (DRC code, task id, autopilot run).
+          </div>
         </div>
       </div>
     </>
@@ -441,11 +634,17 @@ export function AutopilotPage() {
         sub="Continuous validation of NSU's Banner instance against N2S baselines and assigned inner-source patterns. Each saved-form commit triggers a build — snapshot, compare, match, test, report. Drift, regressions, and best-practice gaps surface as findings."
         actions={
           <>
-            <button className="btn btn-secondary btn-sm">
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => notImplemented("Would re-run the Autopilot baseline against the current Banner snapshot")}
+            >
               <Icon name="refresh" size={13}/>
               <span>Re-run baseline</span>
             </button>
-            <button className="btn btn-primary btn-sm">
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => notImplemented("Would enable Run-on-commit — every saved-form commit triggers a new Autopilot build")}
+            >
               <Icon name="bolt" size={13}/>
               <span>Run on commit</span>
             </button>
@@ -614,12 +813,12 @@ export function SettingsPage() {
       <Section eyebrow="Account" title="Janet Hawkins · Lead Consultant">
         <div className="v2-list">
           <div className="v2-row" style={{ cursor: "default" }}>
-            <span className="v2-row-marker accent"/>
+            <span className="v2-row-marker amber"/>
             <div style={{ minWidth: 0 }}>
               <div className="v2-row-title">Connected sources</div>
               <div className="v2-row-sub">Jira · Smartsheet · Autopilot · Standup notes</div>
             </div>
-            <span className="pill pill-neutral pill-dot">All connected</span>
+            <span className="pill pill-amber pill-dot">Demo data — not connected to live systems</span>
           </div>
         </div>
       </Section>
@@ -629,6 +828,7 @@ export function SettingsPage() {
 
 // ── GUIDES ───────────────────────────────────────────────────────────────
 export function GuidesPage() {
+  const [, navigate] = useHash();
   const ocs = OC_INDEX;
 
   const status = (s: string) => {
@@ -650,7 +850,7 @@ export function GuidesPage() {
         {ocs.map(oc => {
           const s = status(oc.status);
           return (
-            <button key={oc.id} className="v2-row" onClick={() => notImplemented(`Would open OC · ${oc.code} ${oc.title}`)}>
+            <button key={oc.id} className="v2-row" onClick={() => navigate(`guides/${oc.id}`)}>
               <span className={`v2-row-marker ${s.tone === "emerald" ? "accent" : s.tone}`}/>
               <div style={{ minWidth: 0 }}>
                 <div className="v2-row-title">{oc.title}</div>
