@@ -1,11 +1,7 @@
-# Release Manager — Memory Index
+# Release Manager Memory
 
-This is the agent's persistent memory across sessions. Add memory entries as separate `.md` files in this directory and link them here.
+## Index
 
-## Conventions
-- `feedback_*.md` — guidance the user has given that should persist (corrections + validations)
-- `project_*.md` — facts about ongoing work, goals, decisions (with **Why:** + **How to apply:**)
-- `reference_*.md` — pointers to external resources (Linear, Slack, dashboards)
-
-## Entries
-_(none yet)_
+| File | Type | Summary |
+|------|------|---------|
+| `project_mvp_pilot_review.md` | project | Full pilot release-readiness assessment as of 2026-05-11; includes deploy chain, version strategy, drift audit pre-flight, open questions |

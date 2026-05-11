@@ -8,4 +8,5 @@ This is the agent's persistent memory across sessions. Add memory entries as sep
 - `reference_*.md` — pointers to external resources (Linear, Slack, dashboards)
 
 ## Entries
-_(none yet)_
+
+- **[project_mvp_pilot_review.md](project_mvp_pilot_review.md)** — 2026-05-11. Full test-engineer lens on production-pilot readiness. Stack recommendation (Playwright only, no Vitest yet), route coverage matrix, 8 sequenced work items, localStorage key reference, 5 open questions for user.

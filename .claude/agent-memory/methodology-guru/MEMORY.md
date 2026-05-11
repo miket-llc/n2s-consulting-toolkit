@@ -8,4 +8,5 @@ This is the agent's persistent memory across sessions. Add memory entries as sep
 - `reference_*.md` — pointers to external resources (Linear, Slack, dashboards)
 
 ## Entries
-_(none yet)_
+
+- **project_mvp_pilot_review.md** — Full domain-accuracy review of lib/data.ts for production-pilot readiness (2026-05-11). Hard errors in NBRPSN, FTVVEND, FINDING_INDEX, CONFIG_FIELDS PoT columns, DRC-4 OC mapping. 11 stub OCs cull/populate recommendations. MVP OC population priority list.

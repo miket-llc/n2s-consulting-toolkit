@@ -8,4 +8,5 @@ This is the agent's persistent memory across sessions. Add memory entries as sep
 - `reference_*.md` — pointers to external resources (Linear, Slack, dashboards)
 
 ## Entries
-_(none yet)_
+
+- `project_mvp_pilot_review.md` — 2026-05-11 full doc audit + pilot plan: README lies, BACKLOG staleness, .xlsx handling, must-have/should-have/could-have doc scope, 9 sequenced work items, 5 risks, 6 open questions for user.
