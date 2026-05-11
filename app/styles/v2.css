@@ -174,7 +174,10 @@ body { font-size: var(--fs-body); }
   display: grid;
   grid-template-columns: 240px 1fr;
   flex: 1;
-  min-height: calc(100vh - 56px);
+  min-height: calc(100vh - var(--topbar-height));
+}
+.v2-shell.has-projctx .v2-body {
+  min-height: calc(100vh - var(--topbar-height) - var(--projctx-height));
 }
 .v2-main {
   padding: 32px 48px 80px;
@@ -184,35 +187,45 @@ body { font-size: var(--fs-body); }
 .v2-main { padding: 20px 32px 60px; }
 
 /* ============================================================
-   Top bar — Ellucian wordmark + project switcher
+   Top bar — narrow (44px) HEEAR-style violet gradient brand strip.
+   Project selector lives in the ProjectContextBar (project-scoped
+   routes only); a passive ProjectIdentityChip surfaces the current
+   engagement on non-project routes so MyWork etc. stay oriented.
    ============================================================ */
 .v2-topbar {
-  height: 56px;
-  background: var(--bg-panel);
-  border-bottom: 1px solid var(--border);
+  height: var(--topbar-height);
+  background: var(--gradient-topbar);
+  border-bottom: 1px solid rgba(0,0,0,0.18);
   position: sticky; top: 0;
   z-index: 50;
 }
+.theme-dark .v2-topbar { background: var(--gradient-topbar-dark); border-bottom-color: rgba(0,0,0,0.4); }
+.theme-light .v2-topbar { background: var(--gradient-topbar); }
 .v2-topbar-inner {
   height: 100%;
-  display: grid;
-  grid-template-columns: 240px 1fr;
+  display: flex;
   align-items: center;
-  padding: 0 20px 0 0;
+  gap: 14px;
+  padding: 0 20px;
 }
 
-/* Brand block — fills left rail width */
+/* Brand block — narrow, violet-on-violet wordmark inverted to white */
 .v2-brand {
   height: 100%;
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 0 18px;
-  border-right: 1px solid var(--border);
-  color: var(--text-primary);
+  padding: 0;
+  color: #fff;
   min-width: 0;
   text-decoration: none;
 }
+.v2-brand:focus-visible { outline: 2px solid rgba(255,255,255,0.6); outline-offset: 4px; border-radius: 2px; }
+.v2-brand .v2-wordmark-img { filter: brightness(0) invert(1); height: 16px; }
+.v2-brand .v2-wordmark-divider { background: rgba(255,255,255,0.4); height: 14px; }
+.v2-brand .v2-wordmark-tag { color: rgba(255,255,255,0.92); font-weight: 500; }
+
+/* Wordmark primitives (also used inside ProjectContextBar / login surfaces) */
 .v2-wordmark {
   display: inline-flex;
   align-items: center;
@@ -244,13 +257,134 @@ body { font-size: var(--fs-body); }
   line-height: 1;
 }
 
-/* Right side of topbar */
+/* Passive project identity chip — non-interactive label of currentProject.
+   Visible on non-project-scoped routes only; clicking it navigates to
+   the Project home (does NOT open the switcher). */
+.v2-projidchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 10px 0 4px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 999px;
+  color: #fff;
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.v2-projidchip:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.32); }
+.v2-projidchip:focus-visible { outline: 2px solid rgba(255,255,255,0.6); outline-offset: 2px; }
+.v2-projidchip-name { color: rgba(255,255,255,0.95); white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+
+/* Right side of topbar — white-tinted controls on the violet gradient */
 .v2-topbar-right {
+  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding-left: 20px;
+  gap: 10px;
+  color: rgba(255,255,255,0.92);
 }
+.v2-topbar-right .v2-icon-btn { color: rgba(255,255,255,0.85); height: 28px; width: 28px; }
+.v2-topbar-right .v2-icon-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
+.v2-topbar-right .v2-icon-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.6); outline-offset: 2px; }
+.v2-topbar-right .v2-search {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.9);
+  height: 28px;
+  width: 260px;
+}
+.v2-topbar-right .v2-search:hover,
+.v2-topbar-right .v2-search:focus-within {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.35);
+}
+.v2-topbar-right .v2-search input { color: #fff; font-size: 12px; }
+.v2-topbar-right .v2-search input::placeholder { color: rgba(255,255,255,0.65); }
+.v2-topbar-right .v2-search .v2-kbd { background: rgba(255,255,255,0.18); color: rgba(255,255,255,0.85); border-color: transparent; }
+.v2-topbar-right .v2-search svg { color: rgba(255,255,255,0.75); }
+.v2-topbar-right .v2-attn {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.22);
+  color: #fff;
+  height: 28px;
+}
+.v2-topbar-right .v2-attn:hover { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.4); }
+.v2-topbar-right .v2-attn:focus-visible { outline: 2px solid rgba(255,255,255,0.6); outline-offset: 2px; }
+.v2-topbar-right .v2-attn-count { color: #fff; background: rgba(0,0,0,0.18); }
+.v2-topbar-right .v2-attn-count.stuck { background: var(--rose); color: #fff; }
+.v2-topbar-right .v2-avatar {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.25);
+  font-size: 11px;
+  height: 28px; width: 28px;
+}
+
+/* ============================================================
+   Project context bar — appears between topbar and body on
+   project-scoped routes only (project, capabilities, guides,
+   decisions, workshops, schedule). Carries the back-to-Portfolio
+   link, the relocated ProjectSwitcher, and the phase·sprint /
+   nextGL pills (per product-owner — keep these for orientation
+   when deep in a guide or decision list).
+   ============================================================ */
+.v2-projctx {
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: var(--projctx-height);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: sticky;
+  top: var(--topbar-height);
+  z-index: 40;
+}
+.v2-projctx-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+  padding: 4px 8px 4px 4px;
+  border-radius: var(--radius-sm);
+  margin-left: -4px;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.v2-projctx-back:hover { background: var(--bg-hover); color: var(--text-primary); }
+.v2-projctx-back:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+.v2-projctx-sep {
+  width: 1px; height: 18px; background: var(--border);
+}
+.v2-projctx .v2-projswitch {
+  border: none; background: transparent; padding: 4px 6px 4px 4px;
+}
+.v2-projctx .v2-projswitch:hover,
+.v2-projctx .v2-projswitch.is-open { background: var(--bg-hover); border-color: transparent; }
+.v2-projctx .v2-projswitch:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+.v2-projctx-meta {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 10px;
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+}
+.v2-projctx-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  font-size: var(--fs-xmicro);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+.v2-projctx-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-ghost); }
+.v2-projctx-pill .dot.green { background: var(--emerald); }
+.v2-projctx-pill .dot.amber { background: var(--amber); }
+.v2-projctx-pill .dot.rose { background: var(--rose); }
 
 /* Project switcher pill — looks "live", reveals dropdown */
 .v2-projswitch {
@@ -307,8 +441,8 @@ body { font-size: var(--fs-body); }
 .v2-projmenu-list { max-height: 400px; overflow-y: auto; padding: 6px; }
 .v2-projmenu-item {
   display: grid;
-  grid-template-columns: 8px 1fr auto;
-  align-items: center; gap: 12px;
+  grid-template-columns: auto 8px 1fr auto;
+  align-items: center; gap: 10px;
   width: 100%;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
@@ -351,6 +485,15 @@ body { font-size: var(--fs-body); }
   transition: background var(--transition-fast);
 }
 .v2-projmenu-allbtn:hover { background: var(--accent-dim); }
+.v2-projmenu-detect {
+  display: flex; align-items: center; gap: 4px;
+  padding: 6px 4px 10px;
+  font-size: var(--fs-xmicro);
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+.v2-projmenu-detect svg { color: var(--emerald); }
+.v2-projmenu-detect .btn-link { font-size: var(--fs-xmicro); padding: 0; margin-left: 2px; }
 
 /* Search */
 .v2-search {
@@ -463,9 +606,13 @@ body { font-size: var(--fs-body); }
   flex-direction: column;
   gap: 4px;
   position: sticky;
-  top: 56px;
-  height: calc(100vh - 56px);
+  top: var(--topbar-height);
+  height: calc(100vh - var(--topbar-height));
   overflow-y: auto;
+}
+.v2-shell.has-projctx .v2-rail {
+  top: calc(var(--topbar-height) + var(--projctx-height));
+  height: calc(100vh - var(--topbar-height) - var(--projctx-height));
 }
 .v2-rail-spacer { flex: 1; }
 .v2-rail-section { display: flex; flex-direction: column; gap: 1px; padding: 4px 0; }

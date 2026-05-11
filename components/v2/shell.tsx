@@ -275,6 +275,10 @@ export function SchoolLogo({ project, size, rounded = "md" }: SchoolLogoProps) {
 }
 
 // ── Project switcher ──────────────────────────────────────────────────────
+// Lives in ProjectContextBar (project-scoped routes only). The dropdown menu
+// surfaces every engagement Janet has access to with school-logo + health dot
+// + readiness + nextGL. Footer notes the Clearbit auto-detect mechanic and
+// links to Settings for per-project overrides.
 function ProjectSwitcher() {
   const { portfolio, currentProject, setCurrentProjectId } = useApp();
   const [, navigate] = useHash();
@@ -327,6 +331,7 @@ function ProjectSwitcher() {
                 role="option"
                 aria-selected={p.id === currentProject.id}
               >
+                <SchoolLogo project={p} size={32} rounded="sm"/>
                 <span className={`v2-projmenu-dot ${p.health}`}/>
                 <div className="stack" style={{ minWidth: 0 }}>
                   <div className="v2-projmenu-name">{p.name}</div>
@@ -340,6 +345,14 @@ function ProjectSwitcher() {
             ))}
           </div>
           <div className="v2-projmenu-foot">
+            <div className="v2-projmenu-detect" title="Logos resolved via Clearbit Logo API. Override per project in Settings.">
+              <Icon name="check" size={11}/>
+              <span>Logos auto-detected · </span>
+              <button
+                className="btn-link"
+                onClick={(e) => { e.stopPropagation(); setOpen(false); navigate("settings"); }}
+              >Override</button>
+            </div>
             <button className="v2-projmenu-allbtn" onClick={() => { setOpen(false); navigate(""); }}>
               <Icon name="grid" size={14}/>
               <span>See all engagements (Portfolio)</span>
@@ -351,14 +364,47 @@ function ProjectSwitcher() {
   );
 }
 
-// ── Top bar ───────────────────────────────────────────────────────────────
-function TopBar() {
+// ── Project identity chip (passive) ───────────────────────────────────────
+// Per product-owner critique: when the ProjectContextBar is hidden (Portfolio,
+// MyWork, Methodology, AskPage, Autopilot, Settings), Janet still needs to
+// know which engagement is "current" without leaving the page. This is a
+// non-interactive identity hint — clicking it navigates to the Project home,
+// but it does NOT open the switcher menu (the full switcher lives in the
+// context bar on project-scoped routes only).
+function ProjectIdentityChip() {
+  const { currentProject } = useApp();
   const [, navigate] = useHash();
+  if (!currentProject) return null;
+  return (
+    <button
+      className="v2-projidchip"
+      onClick={() => navigate("project")}
+      title={`Current engagement: ${currentProject.name} · jump to Project home`}
+      aria-label={`Current engagement: ${currentProject.name}`}
+    >
+      <SchoolLogo project={currentProject} size={22} rounded="sm"/>
+      <span className="v2-projidchip-name">{currentProject.short || currentProject.name}</span>
+    </button>
+  );
+}
+
+// ── Top bar ───────────────────────────────────────────────────────────────
+// Narrow brand-focused strip per design tarball K3NKe3IuvfS03Mr6yWnkDw.
+// 44px tall, violet gradient, white-tinted controls. The full ProjectSwitcher
+// lives in the ProjectContextBar (project-scoped routes only); a passive
+// ProjectIdentityChip surfaces the current engagement on non-project routes
+// so MyWork etc. stay oriented (per product-owner critique).
+function TopBar() {
+  const [route, navigate] = useHash();
   const { theme, setTheme, defaultLanding } = useApp();
   const searchRef = useRef<HTMLInputElement>(null);
 
   const drcs = DRCS.filter(d => d.status !== "resolved");
   const stuck = drcs.filter(d => (d.daysStale || 0) >= 5).length;
+
+  // Show passive identity chip everywhere the ProjectContextBar is hidden.
+  const top = route.split("?")[0].split("#")[0].split("/")[0];
+  const showIdentityChip = !PROJECT_SCOPED_ROUTES.has(top);
 
   // ⌘K / Ctrl-K focuses the toolkit search input.
   useEffect(() => {
@@ -379,11 +425,10 @@ function TopBar() {
         <a className="v2-brand" href="#" onClick={(e) => { e.preventDefault(); navigate(defaultLanding === "project" ? "project" : ""); }}>
           <EllucianWordmark/>
         </a>
+        {showIdentityChip && <ProjectIdentityChip/>}
         <div className="v2-topbar-right">
-          <ProjectSwitcher/>
-          <div className="flex-1"/>
           <div className="v2-search">
-            <Icon name="search" size={15}/>
+            <Icon name="search" size={14}/>
             <input ref={searchRef} placeholder="Search the toolkit…" aria-label="Search the toolkit" type="search"/>
             <span className="v2-kbd">⌘K</span>
           </div>
@@ -393,7 +438,7 @@ function TopBar() {
               title={`${drcs.length} open client decisions${stuck ? ` · ${stuck} stuck 5+ days` : ""}`}
               onClick={() => navigate("decisions")}
             >
-              <Icon name="decisions" size={14}/>
+              <Icon name="decisions" size={13}/>
               <span className="v2-attn-label">Decisions</span>
               <span className={`v2-attn-count ${stuck ? "stuck" : ""}`}>{drcs.length}</span>
               {stuck > 0 && <span className="v2-attn-dot" aria-label={`${stuck} stuck`}/>}
@@ -404,12 +449,58 @@ function TopBar() {
             title={theme === "dark" ? "Light mode" : "Dark mode"}
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           >
-            <Icon name={theme === "dark" ? "sun" : "moon"} size={15}/>
+            <Icon name={theme === "dark" ? "sun" : "moon"} size={14}/>
           </button>
           <div className="v2-avatar" title="Janet Hawkins · Lead Consultant">JH</div>
         </div>
       </div>
     </header>
+  );
+}
+
+// ── Project context bar ───────────────────────────────────────────────────
+// Appears between the topbar and the body, but only on project-scoped routes
+// (the project view itself + the destinations that live inside an engagement:
+// capabilities, guides, decisions, workshops, schedule). Practice-wide routes
+// (Portfolio "", MyWork, Methodology "library", AskPage "ai", Autopilot,
+// Settings) skip this strip — the project selector isn't relevant there.
+const PROJECT_SCOPED_ROUTES = new Set<string>([
+  "project", "capabilities", "guides", "decisions", "workshops", "schedule",
+]);
+
+export function isProjectScopedRoute(route: string): boolean {
+  const top = route.split("?")[0].split("#")[0].split("/")[0];
+  return PROJECT_SCOPED_ROUTES.has(top);
+}
+
+function ProjectContextBar() {
+  const [route, navigate] = useHash();
+  const { currentProject } = useApp();
+  if (!isProjectScopedRoute(route) || !currentProject) return null;
+  const health = currentProject.health || "green";
+  const phase = currentProject.phase || "Build";
+  const sprint = currentProject.sprint != null ? String(currentProject.sprint) : "1";
+  const nextGL = currentProject.nextGL || "";
+  return (
+    <div className="v2-projctx" role="navigation" aria-label="Project context">
+      <button className="v2-projctx-back" onClick={() => navigate("")} title="Back to portfolio">
+        <Icon name="chevron-left" size={13}/>
+        <span>Portfolio</span>
+      </button>
+      <span className="v2-projctx-sep" aria-hidden/>
+      <ProjectSwitcher/>
+      <div className="v2-projctx-meta">
+        <span className="v2-projctx-pill">
+          <span className={`dot ${health}`}/>
+          <span>{phase} · Sprint {sprint}</span>
+        </span>
+        {nextGL && (
+          <span className="v2-projctx-pill">
+            <span>{nextGL}</span>
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -476,9 +567,12 @@ function Rail() {
 
 // ── Page shell ────────────────────────────────────────────────────────────
 export function PageShell({ children }: { children: React.ReactNode }) {
+  const [route] = useHash();
+  const projctx = isProjectScopedRoute(route);
   return (
-    <div className="v2-shell">
+    <div className={`v2-shell${projctx ? " has-projctx" : ""}`}>
       <TopBar/>
+      <ProjectContextBar/>
       <div className="v2-body">
         <Rail/>
         <main className="v2-main">{children}</main>

@@ -4,7 +4,7 @@ import * as React from "react";
 export type IconName =
   | "home" | "inbox" | "decisions" | "guides" | "capabilities" | "schedule" | "workshops"
   | "library" | "ai" | "search" | "settings" | "moon" | "sun" | "list" | "grid"
-  | "chevron-right" | "chevron-down" | "arrow-right" | "arrow-up-right" | "external"
+  | "chevron-left" | "chevron-right" | "chevron-down" | "arrow-right" | "arrow-up-right" | "external"
   | "check" | "x" | "plus" | "minus" | "warn" | "alert" | "bolt" | "refresh" | "info"
   | "spark" | "play" | "filter" | "clock" | "user" | "users" | "book" | "send"
   | "sparkle" | "more" | "command";
@@ -44,6 +44,7 @@ export function Icon({ name, size = 18, stroke = 1.5, style }: IconProps) {
     case "sun": return <svg {...props}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>;
     case "list": return <svg {...props}><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>;
     case "grid": return <svg {...props}><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>;
+    case "chevron-left": return <svg {...props}><path d="M15 6l-6 6 6 6"/></svg>;
     case "chevron-right": return <svg {...props}><path d="M9 6l6 6-6 6"/></svg>;
     case "chevron-down": return <svg {...props}><path d="M6 9l6 6 6-6"/></svg>;
     case "arrow-right": return <svg {...props}><path d="M5 12h14M13 5l7 7-7 7"/></svg>;

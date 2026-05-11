@@ -1,18 +1,21 @@
 # Drift Audit — 2026-05-15
 
-**Audit baseline:** Source design tarball `CgM4C5b7mEU63Y2RQISWcw`
-**URL:** `https://api.anthropic.com/v1/design/h/CgM4C5b7mEU63Y2RQISWcw`
-**Extracted at:** `/tmp/design-CgM4C5b7/n2s-consulting-toolkit/`
+**Audit baseline:** Source design tarball `K3NKe3IuvfS03Mr6yWnkDw` (re-anchored 2026-05-11 PM — see baseline-pivot note below)
+**URL:** `https://api.anthropic.com/v1/design/h/K3NKe3IuvfS03Mr6yWnkDw`
+**Extracted at:** `/tmp/design-K3NKe3Iu/n2s-consulting-toolkit/`
+**SHA-256 (first 12):** `c19d0f5c0259`
 **Port under audit:** this repo (`n2s-consulting-toolkit`)
-**Audited by:** design-fidelity-guardian (with chief-architect for architectural scope)
+**Audited by:** design-fidelity-guardian (with chief-architect for architectural scope, ux-visionary + product-manager + product-owner for the K3NKe3Iu shell-slice review)
 **Audit window:** pre-flight 2026-05-13 EOD → fires 2026-05-15
 **Frozen build:** tag `v0.2.0-pre-audit` (release-manager to cut at audit-input SHA)
+
+> **Baseline re-anchor — 2026-05-11 PM.** A second design tarball (`K3NKe3IuvfS03Mr6yWnkDw`) landed mid-day with a redesigned shell — narrow violet TopBar (44px, HEEAR-style), `ProjectSwitcher` relocated out of the topbar into a new `ProjectContextBar` strip that renders only on project-scoped routes. User explicitly authorized implementation pre-audit (overriding the May 13 EOD UI freeze for this slice). Implementation landed in commit-pending and includes one product-owner-required tweak beyond the literal design (passive `ProjectIdentityChip` in the topbar on non-project routes so MyWork etc. stay oriented). Per `product-manager` Option (a) in `.claude/agent-memory/product-manager/project_design_K3NKe3Iu_scope_check.md`: re-anchor the baseline rather than auditing the implementation against a layout the user already rejected. The Stance A drift items from the prior baseline that this re-anchor closes: C6 (SchoolLogo restored in `ProjectSwitcher` menu), C8 (`.v2-projswitch` padding nudges, mooted by violet topbar). C7 (`PageHero.has-logo` rule) remains open, folded into Sprint B0-3.
 
 ---
 
 ## 1. Methodology
 
-The tarball ships its active design surface under `project/v2/*.jsx` plus `project/Ellucian Consulting Toolkit.html` as the host. v2 here (`components/v2/*.tsx`) maps to `project/v2/*` 1:1 by file name. The tarball also preserves a `project/v1-archive/` set that mirrors this port's `components/views/*` and root-level `components/{shell,icons,tweaks-panel}.tsx`.
+The tarball ships its active design surface under `project/v2/*.jsx` plus `project/Ellucian Consulting Toolkit.html` as the host. v2 here (`components/v2/*.tsx`) maps to `project/v2/*` 1:1 by file name. The tarball also preserves a `project/v1-archive/` set that mirrors this port's `components/views/*` and root-level `components/{shell,icons,tweaks-panel}.tsx`. The new `K3NKe3Iu` baseline additionally bundles 7 design-chat transcripts under `project/chats/*.md`; intent for the shell redesign lives in `chat7.md` (search "i feel like we abandoned").
 
 For each ported surface, every diff vs. tarball is classified into one of three buckets:
 

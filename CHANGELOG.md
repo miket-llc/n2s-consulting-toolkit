@@ -4,6 +4,33 @@ All notable changes to the n2s-consulting-toolkit prototype are recorded here.
 Format roughly follows [Keep a Changelog](https://keepachangelog.com).
 Versions are semver-ish for a prototype (`0.x` is pre-pilot; `1.0` will be the first stable pilot cut).
 
+## [Unreleased] — 2026-05-11 (late afternoon)
+
+Shell redesign + drift-audit baseline re-anchor to design tarball `K3NKe3IuvfS03Mr6yWnkDw`. New narrow violet TopBar (HEEAR-style) and relocated `ProjectSwitcher` per user direction in design `chat7.md`. Pre-audit UI change explicitly authorized by user; the May 13 EOD freeze still applies to all OTHER UI work.
+
+### Added
+- `components/v2/shell.tsx` — new `ProjectContextBar` component. Appears between `TopBar` and body on project-scoped routes only (`project`, `capabilities`, `guides`, `decisions`, `workshops`, `schedule`). Contains a "← Portfolio" back-link, the relocated `ProjectSwitcher`, and meta pills (phase·sprint, nextGL) for orientation when deep in a guide or decisions list. Practice-wide routes (`""`, `mywork`, `library`, `ai`, `autopilot`, `settings`) skip this strip.
+- `components/v2/shell.tsx` — new `ProjectIdentityChip` component (one tweak beyond the literal design, per `product-owner` critique). Surfaces the current engagement (school logo + short name, non-interactive) in the topbar on non-project routes so MyWork etc. stay oriented during fast context-switches. Clicking it navigates to the Project home; it does NOT open the switcher menu.
+- `components/v2/shell.tsx` — `isProjectScopedRoute()` exported helper + `PROJECT_SCOPED_ROUTES` set.
+- `components/v2/icons.tsx` — `chevron-left` icon for the back-to-Portfolio link.
+- `app/styles/tokens.css` — `--topbar-height: 44px`, `--projctx-height: 44px`, `--gradient-topbar-dark` (deeper violet for dark mode).
+- `app/styles/v2.css` — `.v2-topbar` (violet gradient sticky strip with white-tinted controls + `.theme-dark` override), `.v2-brand` (white wordmark via `filter: brightness(0) invert(1)`), `.v2-projidchip*`, `.v2-projctx*` (the new sub-strip with back-link, switcher seat, meta pills), `.v2-projmenu-detect` (restored "Logos auto-detected · Override" footer), `.v2-shell.has-projctx` rail/body offset adjustments.
+- `.claude/agent-memory/{ux-visionary,product-manager,product-owner}/project_design_K3NKe3Iu_*.md` — three parallel critiques (delta spec, scope check, Janet reaction).
+- `docs/audits/DRIFT-AUDIT-2026-05-15.md` — baseline re-anchor banner explaining the pivot and the closed Stance-A drift items (C6, C8); C7 remains for B0-3.
+
+### Changed
+- `components/v2/shell.tsx` `TopBar` — slimmed: brand wordmark + (passive identity chip on non-project routes) + search + decisions chip + theme toggle + avatar. `ProjectSwitcher` removed. White-tinted controls on the violet gradient (28px controls). Decisions chip routes to `decisions` (the design's `project/decisions` is unhandled in the router; corrected per `ux-visionary`).
+- `components/v2/shell.tsx` `ProjectSwitcher` — restored per-row `SchoolLogo` (32px, rounded-sm) in the dropdown menu (closes prior audit drift item C6); restored "Logos auto-detected · Override" footer linking to Settings.
+- `components/v2/shell.tsx` `PageShell` — renders `ProjectContextBar` between `TopBar` and `.v2-body`; toggles `has-projctx` class on `.v2-shell` to drive the rail / body offset (44px without context bar, 88px with).
+- `app/styles/v2.css` — `.v2-topbar` (56→44px, flat panel → violet gradient), `.v2-topbar-inner` (240px-grid → flex with 20px padding), `.v2-brand` (no border/padding; white text via inverted-img filter), `.v2-topbar-right` (margin-auto, gap 10px, white-tinted children), `.v2-projmenu-item` grid (`8px 1fr auto` → `auto 8px 1fr auto` for the new SchoolLogo column), `.v2-rail` (top + height now use `var(--topbar-height)`; `.v2-shell.has-projctx .v2-rail` adds the projctx offset).
+- `docs/audits/DRIFT-AUDIT-2026-05-15.md` — baseline pivoted from `CgM4C5b7mEU63Y2RQISWcw` → `K3NKe3IuvfS03Mr6yWnkDw`. Methodology note adds the new chats/ bundle.
+- `.claude/agent-memory/design-fidelity-guardian/reference_design_tarballs.md` — new tarball entry; pointer to chat-transcript convention.
+
+### Deploy / repo state
+- Pushed `f6d68c8` (Stance B replan) to `origin/main`.
+- Set branch protection on `main` via `gh api`: linear history required, no force-pushes, no deletions, dismiss stale reviews. PR-required count is 0 (single-contributor repo for now; bump when more collaborators land).
+- Tag `v0.2.0-pre-audit.1` already on origin (no new tag for this slice; stays pre-audit).
+
 ## [Unreleased] — 2026-05-11 (afternoon)
 
 Planning pivot. Doc-only; no UI changes (audit-safe). User answered the six load-bearing questions in `docs/MVP-PILOT-PLAN.md` §2; three answers (Q1 → Stance B, Q3 → >5 self-serve users, Q6 → real LLM behind AskPage before pilot) cluster into a Stance A → Stance B pivot. `chief-architect` produced a replan that replaces PLAN §5–§14.
