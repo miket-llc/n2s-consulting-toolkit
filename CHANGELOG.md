@@ -4,6 +4,25 @@ All notable changes to the n2s-consulting-toolkit prototype are recorded here.
 Format roughly follows [Keep a Changelog](https://keepachangelog.com).
 Versions are semver-ish for a prototype (`0.x` is pre-pilot; `1.0` will be the first stable pilot cut).
 
+## [Unreleased] — 2026-05-11 (afternoon)
+
+Planning pivot. Doc-only; no UI changes (audit-safe). User answered the six load-bearing questions in `docs/MVP-PILOT-PLAN.md` §2; three answers (Q1 → Stance B, Q3 → >5 self-serve users, Q6 → real LLM behind AskPage before pilot) cluster into a Stance A → Stance B pivot. `chief-architect` produced a replan that replaces PLAN §5–§14.
+
+### Added
+- `docs/MVP-PILOT-PLAN.md` §5–§14 — Stance B replan: locked stack (Clerk + Neon Postgres + Drizzle + Vercel AI SDK + AI Gateway + pgvector, all via Vercel Marketplace), Postgres data model (catalog / per-engagement / per-user split), six-sprint sequence (B0 cleanup → B5 content + rehearsal), pilot date 2026-08-03, Stance B risk register (R-AUTH, R-MIG, R-LLM-COST, R-LLM-HALL, R-COLD, R-SECRETS, R-FERPA, R-LOCK, R-INVITE, R-PARITY, R-EMPTY-OC, R-CONTENT-DRIFT, R-XSS), updated cull catalog, updated agent ownership matrix, six open architectural sub-questions for the user.
+- `.claude/agent-memory/chief-architect/project_stance_b_replan_2026_05_11.md` — full reasoning trace (~18 KB) behind every choice in PLAN §5–§14: why each stack pick, sprint-sequencing logic for solo+agents capacity, calendar derivation honoring US holidays, sub-question recommendations.
+- New agents recommended for the roster: `platform-engineer` (NEW; owns server-side surface — Drizzle schema + migrations, API routes, Clerk wiring, Neon connection, AI Gateway integration, secrets, audit log) and `ai-architect` (already in available registry; formally added to roster for B4 RFC). `docs-leader` to update `AGENTS.md`; `chief-architect` to draft platform-engineer spec.
+
+### Changed
+- `docs/MVP-PILOT-PLAN.md` §1–§2 + status banner — Stance A recommendation preserved as historical context with a Stance-B-pivot UPDATE callout. §2 rewritten as RESOLVED with the answers table and Stance-B-specific secondary questions.
+- `docs/MVP-PILOT-PLAN.md` §5 banner — old Stance A §5 (3-sprint plan with rows A1–A20, B1–B20, C1–C16) replaced; surviving items (B1 v1 cull, B2 dead-export cull, audit-drift fixes, focus pass, CSS cull, CI gate, Playwright bootstrap) folded into the new B0 sprint.
+- `BACKLOG.md` — State of play notes the pivot; "Open questions" rewritten as RESOLVED; "Stance B replan" section now LANDED with headline summary; old Sprint B/C marked OBSOLETE; Tier 2 + Out-of-scope rewritten so multi-user / persistence / LLM are no longer described as deferred.
+- `docs/HANDOFF.md` — pivot banner at top so any fresh session pasted from this handoff sees the update before acting on Stance A guidance.
+- `.claude/agent-memory/chief-architect/MEMORY.md` — new entry indexes the Stance B replan trace; prior `project_mvp_pilot_review.md` flagged as superseded.
+
+### Versioning note
+Per the Stance B replan, the next release tags are `0.3.0-beta.1` at end of Sprint B3 (mutations + cutover) and `1.0.0-pilot.1` at end of Sprint B5 (content + rehearsal). The Stance A `0.2.0` (final, drop pre-audit suffix) version is now obsolete and skipped.
+
 ## [0.2.0-pre-audit.1] — 2026-05-11
 
 Sprint A — pre-audit hygiene. All landed UI-safe changes ahead of the 2026-05-15 drift audit. See [docs/MVP-PILOT-PLAN.md](docs/MVP-PILOT-PLAN.md) and [docs/audits/DRIFT-AUDIT-2026-05-15.md](docs/audits/DRIFT-AUDIT-2026-05-15.md).

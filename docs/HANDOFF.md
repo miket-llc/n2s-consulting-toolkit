@@ -6,6 +6,21 @@
 
 ---
 
+> **STATUS UPDATE — 2026-05-11 PM (after this handoff was written).**
+>
+> User answered the six load-bearing questions in [`MVP-PILOT-PLAN.md`](MVP-PILOT-PLAN.md) §2. Three answers cluster into a Stance pivot:
+> - **Q1 → Stance B** (prototype + real backend, NOT recommended Stance A)
+> - **Q3 → >5 self-serve users** (engagement-scoped isolation now must-have)
+> - **Q6 → Real LLM behind AskPage before pilot**
+>
+> The "Sprint B" / "Sprint C" / "Tone" / "Honest scope reminder" sections below describe the **obsolete Stance A plan**. They are preserved as historical context. **Do not act on them.** `chief-architect` produced the Stance B replan; **`docs/MVP-PILOT-PLAN.md` §5–§14 is now the live plan** (architecture, data model, six-sprint sequence B0→B5, pilot 2026-08-03, new `platform-engineer` agent recommended). Reasoning trace at `.claude/agent-memory/chief-architect/project_stance_b_replan_2026_05_11.md`. The May 15 drift audit + May 13 EOD freeze + Sprint A items already shipped are unaffected.
+>
+> **What still applies from this handoff:** the doc-reading order at the top of "Paste this into a new session"; the running-locally section (port 4321, smoke gate); the "What's left for the user" interactive items (Vercel link, preview, prod, push tag, branch protect — Vercel still the deploy platform per Q5).
+>
+> **What does NOT apply:** Sprint B/C tables (rescoped); the "Single user (Janet)" tone bullet (multi-user is now scoped in); the "Honest scope reminder" Stance A claim.
+
+---
+
 ## Paste this into a new session to pick up the work
 
 > You are continuing work on **n2s-consulting-toolkit** at `/Users/mdt/dev/n2s-consulting-toolkit`. The repo is a hi-fi clickable prototype of an internal Ellucian Banner-SaaS consulting toolkit, working toward a hosted production pilot. Sprint A pre-audit hygiene shipped today (2026-05-11) as `v0.2.0-pre-audit.1`. The drift audit fires 2026-05-15; Sprint B starts 2026-05-18.
