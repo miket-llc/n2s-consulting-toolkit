@@ -11,12 +11,13 @@ import {
   IconJira, IconActivity,
 } from "@/components/icons";
 import { OC_DATA } from "@/lib/data";
+import type { OCSection } from "@/lib/data";
 
-type OcSection = (typeof OC_DATA.sections)[number];
+type OcSection = OCSection;
 type OcTask = NonNullable<OcSection["tasks"]>[number];
 
 export function OCGuide({ layout = "two-pane", onBack, onOpenTask }: { ocId?: string; layout?: string; onBack: () => void; onOpenTask: (t: OcTask) => void }) {
-  const oc = OC_DATA;
+  const oc = OC_DATA["soaterm"];
   const sections = oc.sections;
   const [activeId, setActiveId] = React.useState(sections[0].id);
   const [showAI, setShowAI] = React.useState(false);

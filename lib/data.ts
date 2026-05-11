@@ -73,71 +73,105 @@ export const TASKS = [
   { id: "t10", jiraId: "NSU-220", project: "NSU",  capability: "BC-AR",         title: "Define detail-code taxonomy for graduate fees",                             status: "Backlog",     priority: "P3", due: "Next week",    dueRel: "later",     assignee: "rk", commentCount: 0, lastSync: "1h ago" },
 ];
 
-export const OC_DATA = {
-  code: "OC-2.4.1",
-  product: "Banner SaaS",
-  title: "SOATERM · Term Code Configuration",
-  summary: "Establish each academic term as a discrete code with full calendar, parts-of-term, registration windows, and downstream activation flags. SOATERM is foundational — every section, registration, billing rule, and FA award-year tie-in keys off it.",
-  sections: [
-    {
-      id: "overview", num: "01", title: "Overview & decisions", complete: true,
-      intro: "Term codes follow Banner's YYYYMM convention where MM encodes the season (10=Fall, 20=Spring, 30=Summer). Northern State University will continue using its long-standing 6-digit convention; reuse is preferred for FA history continuity. Two key decisions drive this OC: parts-of-term structure and registration-window separation.",
-      callouts: [
-        { kind: "best-practice", from: "Inner-source · 142 engagements", text: "Stick to YYYYMM unless the institution has a documented prefixing scheme. Custom term-code formats fragment integration tooling and break ~60% of pre-built reports." },
-        { kind: "watchout", text: "Once SOATERM is saved with a term code, the code itself cannot be changed without a destructive migration. Treat term-code creation as a one-way door." },
-      ],
-    },
-    {
-      id: "create", num: "02", title: "Create the term code", complete: true,
-      intro: "Open SOATERM in form mode. Enter the new term code (e.g. 202610 for Fall 2026), tab to begin a fresh record, and complete the basic identity fields before moving to calendar.",
-      steps: [
-        {
-          num: 1, title: "Enter term identity",
-          body: "Term description should be the canonical academic-calendar phrasing. The acad-year and FA proc-year are <em>almost always equal</em> but split intentionally for institutions whose FA cycle leads or lags.",
-          fields: [
-            { field: "STVTERM_CODE",       value: "202610",     why: "Convention: YYYYMM · Fall 2026" },
-            { field: "STVTERM_DESC",       value: "Fall 2026",  why: "Shows on student record, transcripts" },
-            { field: "STVTERM_START_DATE", value: "2026-08-24", why: "Class day 1 — drives census" },
-            { field: "STVTERM_END_DATE",   value: "2026-12-18", why: "Last final, last billable day" },
-            { field: "STVTERM_ACYR_CODE",  value: "2627",       why: "Academic year FY27" },
-            { field: "STVTERM_FA_PROC_YR", value: "2627",       why: "Aligns with packaging cycle" },
-          ],
-        },
-      ],
-    },
-    {
-      id: "pot", num: "03", title: "Parts-of-term structure",
-      intro: "Parts-of-term split the master term into mini-sessions with their own start/end dates, drop deadlines, and refund schedules. NSU has historically run a single full-term and a 1-week mini in January; a working group recommended adding a half-A / half-B split for online undergrad to align with peer institutions.",
-      callouts: [
-        { kind: "watchout", text: "Census date per part-of-term is independent of the master term census. If you forget to set per-PoT census, enrollment counts roll up only to the term-level census, which can mis-state IPEDS reporting." },
-        { kind: "pattern", from: "NSU-Term-2025 inner source", text: "WIU and South Methodist both adopted a 4-PoT layout (Full / Half-A / Half-B / Late-start) and saw 22% drop in registration support tickets in the first year. Pattern is reusable here as 'pot-4-block-v2'." },
-      ],
-      steps: [
-        {
-          num: 2, title: "Add parts-of-term records",
-          body: "Use the SOATERM Parts of Term tab. Each row needs a unique sub-code, start/end dates that fall <strong>within</strong> the master term's window, and a census date. Save after each row to surface validation errors before they cascade.",
-          fields: [
-            { field: "SOBPTRM_PTRM_CODE", value: "1",   why: "Standard full-term" },
-            { field: "POT 1 · weeks",     value: "16",  why: "Aug 24 – Dec 18" },
-            { field: "SOBPTRM_PTRM_CODE", value: "HA",  why: "Half-A mini-session" },
-            { field: "POT HA · weeks",    value: "8",   why: "Aug 24 – Oct 17" },
-            { field: "SOBPTRM_PTRM_CODE", value: "HB",  why: "Half-B mini-session" },
-            { field: "POT HB · weeks",    value: "8",   why: "Oct 19 – Dec 18" },
-          ],
-        },
-      ],
-      tasks: [
-        { id: "NSU-184", title: "Confirm PoT split for Fall 2026 with registrar", priority: "P1", due: "Today" },
-      ],
-    },
-    {
-      id: "reg-windows", num: "04", title: "Registration windows",
-      intro: "Registration windows control when student cohorts can begin enrolling. Cohorts are typically priority-grouped (graduate, senior, junior, sophomore, freshman, non-degree) with staggered open dates. NSU is debating a single-window vs split UG/GR approach — DRC-3 is open.",
-      steps: [
-        {
-          num: 3, title: "Configure window dates",
-          body: "Build registration windows in SFARCTL after SOATERM is saved. For each cohort, set begin and end dates and the part-of-term they apply to. Sequence matters — Banner enforces the priority order at the cohort level.",
-          code: `-- Inner-source: NSU-Term-2025 / reg-window-pattern
+// ── OC Guide data ────────────────────────────────────────────────────────────
+// Per-OC configuration guide bodies. The ConfigurationGuidePage in detail.tsx
+// looks up by ocId key. Add new OC keys here as content is authored; only
+// lib/data.ts changes needed to populate an OC body (data-only pattern).
+
+export type OCSection = {
+  id: string;
+  num: string;
+  title: string;
+  complete?: boolean;
+  intro?: string;
+  callouts?: Array<{ kind: string; from?: string; text: string }>;
+  steps?: Array<{
+    num: number;
+    title: string;
+    body?: string;
+    fields?: Array<{ field: string; value: string; why: string }>;
+    code?: string;
+    codeLang?: string;
+  }>;
+  tasks?: Array<{ id: string; title: string; priority: string; due: string }>;
+};
+
+export type OCDefinition = {
+  code: string;
+  product: string;
+  title: string;
+  summary: string;
+  sections: OCSection[];
+};
+
+export const OC_DATA: Record<string, OCDefinition> = {
+
+  // ── SOATERM ───────────────────────────────────────────────────────────────
+  soaterm: {
+    code: "OC-2.4.1",
+    product: "Banner SaaS",
+    title: "SOATERM · Term Code Configuration",
+    summary: "Establish each academic term as a discrete code with full calendar, parts-of-term, registration windows, and downstream activation flags. SOATERM is foundational — every section, registration, billing rule, and FA award-year tie-in keys off it.",
+    sections: [
+      {
+        id: "overview", num: "01", title: "Overview & decisions", complete: true,
+        intro: "Term codes follow Banner's YYYYMM convention where MM encodes the season (10=Fall, 20=Spring, 30=Summer). Northern State University will continue using its long-standing 6-digit convention; reuse is preferred for FA history continuity. Two key decisions drive this OC: parts-of-term structure and registration-window separation.",
+        callouts: [
+          { kind: "best-practice", from: "Inner-source · 142 engagements", text: "Stick to YYYYMM unless the institution has a documented prefixing scheme. Custom term-code formats fragment integration tooling and break ~60% of pre-built reports." },
+          { kind: "watchout", text: "Once SOATERM is saved with a term code, the code itself cannot be changed without a destructive migration. Treat term-code creation as a one-way door." },
+        ],
+      },
+      {
+        id: "create", num: "02", title: "Create the term code", complete: true,
+        intro: "Open SOATERM in form mode. Enter the new term code (e.g. 202610 for Fall 2026), tab to begin a fresh record, and complete the basic identity fields before moving to calendar.",
+        steps: [
+          {
+            num: 1, title: "Enter term identity",
+            body: "Term description should be the canonical academic-calendar phrasing. The acad-year and FA proc-year are <em>almost always equal</em> but split intentionally for institutions whose FA cycle leads or lags.",
+            fields: [
+              { field: "STVTERM_CODE",       value: "202610",     why: "Convention: YYYYMM · Fall 2026" },
+              { field: "STVTERM_DESC",       value: "Fall 2026",  why: "Shows on student record, transcripts" },
+              { field: "STVTERM_START_DATE", value: "2026-08-24", why: "Class day 1 — drives census" },
+              { field: "STVTERM_END_DATE",   value: "2026-12-18", why: "Last final, last billable day" },
+              { field: "STVTERM_ACYR_CODE",  value: "2627",       why: "Academic year FY27" },
+              { field: "STVTERM_FA_PROC_YR", value: "2627",       why: "Aligns with packaging cycle" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "pot", num: "03", title: "Parts-of-term structure",
+        intro: "Parts-of-term split the master term into mini-sessions with their own start/end dates, drop deadlines, and refund schedules. NSU has historically run a single full-term and a 1-week mini in January; a working group recommended adding a half-A / half-B split for online undergrad to align with peer institutions.",
+        callouts: [
+          { kind: "watchout", text: "Census date per part-of-term is independent of the master term census. If you forget to set per-PoT census, enrollment counts roll up only to the term-level census, which can mis-state IPEDS reporting." },
+          { kind: "pattern", from: "NSU-Term-2025 inner source", text: "WIU and South Methodist both adopted a 4-PoT layout (Full / Half-A / Half-B / Late-start) and saw 22% drop in registration support tickets in the first year. Pattern is reusable here as 'pot-4-block-v2'." },
+        ],
+        steps: [
+          {
+            num: 2, title: "Add parts-of-term records",
+            body: "Use the SOATERM Parts of Term tab. Each row needs a unique sub-code, start/end dates that fall <strong>within</strong> the master term's window, and a census date. Save after each row to surface validation errors before they cascade.",
+            fields: [
+              { field: "SOBPTRM_PTRM_CODE", value: "1",   why: "Standard full-term" },
+              { field: "POT 1 · weeks",     value: "16",  why: "Aug 24 – Dec 18" },
+              { field: "SOBPTRM_PTRM_CODE", value: "HA",  why: "Half-A mini-session" },
+              { field: "POT HA · weeks",    value: "8",   why: "Aug 24 – Oct 17" },
+              { field: "SOBPTRM_PTRM_CODE", value: "HB",  why: "Half-B mini-session" },
+              { field: "POT HB · weeks",    value: "8",   why: "Oct 19 – Dec 18" },
+            ],
+          },
+        ],
+        tasks: [
+          { id: "NSU-184", title: "Confirm PoT split for Fall 2026 with registrar", priority: "P1", due: "Today" },
+        ],
+      },
+      {
+        id: "reg-windows", num: "04", title: "Registration windows",
+        intro: "Registration windows control when student cohorts can begin enrolling. Cohorts are typically priority-grouped (graduate, senior, junior, sophomore, freshman, non-degree) with staggered open dates. NSU is debating a single-window vs split UG/GR approach — DRC-3 is open.",
+        steps: [
+          {
+            num: 3, title: "Configure window dates",
+            body: "Build registration windows in SFARCTL after SOATERM is saved. For each cohort, set begin and end dates and the part-of-term they apply to. Sequence matters — Banner enforces the priority order at the cohort level.",
+            code: `-- Inner-source: NSU-Term-2025 / reg-window-pattern
 -- Generates SFARCTL records from a STVTERM input
 INSERT INTO sfrrgcl (sfrrgcl_term_code, sfrrgcl_levl_code,
                     sfrrgcl_styp_code, sfrrgcl_begin_date,
@@ -146,41 +180,223 @@ SELECT '202610', 'GR', NULL,
        TO_DATE('2026-04-01 09:00','YYYY-MM-DD HH24:MI'),
        TO_DATE('2026-08-23 23:59','YYYY-MM-DD HH24:MI'),
        NULL FROM dual;`,
-          codeLang: "sql",
-        },
-      ],
-      tasks: [
-        { id: "NSU-187", title: "Resolve DRC-3: graduate vs undergrad window separation", priority: "P1", due: "Today" },
-      ],
-    },
-    {
-      id: "downstream", num: "05", title: "Downstream activation",
-      intro: "SOATERM has 14 downstream system flags. Three matter most for go-live: housing-term flag (drives SLBRMAP), enrollment-counts flag (drives IPEDS), and FA proc-year (must equal acad-year unless cycle is offset).",
-      callouts: [
-        { kind: "best-practice", text: "Activate the housing-term flag last — only after housing assignments are confirmed. Activating it early opens room-billing detail codes prematurely." },
-      ],
-    },
-    {
-      id: "validation", num: "06", title: "Validation & sign-off",
-      intro: "Run the autopilot baseline check after every save. Validation surfaces the exact rows that drift from the N2S baseline and the Inner-source pattern you've chosen. The OC is signed off only when all linked Jira tasks resolve and the registrar e-signs the calendar.",
-    },
-  ] as Array<{
-    id: string;
-    num: string;
-    title: string;
-    complete?: boolean;
-    intro?: string;
-    callouts?: Array<{ kind: string; from?: string; text: string }>;
-    steps?: Array<{
-      num: number;
-      title: string;
-      body?: string;
-      fields?: Array<{ field: string; value: string; why: string }>;
-      code?: string;
-      codeLang?: string;
-    }>;
-    tasks?: Array<{ id: string; title: string; priority: string; due: string }>;
-  }>,
+            codeLang: "sql",
+          },
+        ],
+        tasks: [
+          { id: "NSU-187", title: "Resolve DRC-3: graduate vs undergrad window separation", priority: "P1", due: "Today" },
+        ],
+      },
+      {
+        id: "downstream", num: "05", title: "Downstream activation",
+        intro: "SOATERM has 14 downstream system flags. Three matter most for go-live: housing-term flag (drives SLBRMAP), enrollment-counts flag (drives IPEDS), and FA proc-year (must equal acad-year unless cycle is offset).",
+        callouts: [
+          { kind: "best-practice", text: "Activate the housing-term flag last — only after housing assignments are confirmed. Activating it early opens room-billing detail codes prematurely." },
+        ],
+      },
+      {
+        id: "validation", num: "06", title: "Validation & sign-off",
+        intro: "Run the autopilot baseline check after every save. Validation surfaces the exact rows that drift from the N2S baseline and the Inner-source pattern you've chosen. The OC is signed off only when all linked Jira tasks resolve and the registrar e-signs the calendar.",
+      },
+    ],
+  },
+
+  // ── SFARCTL ───────────────────────────────────────────────────────────────
+  // Sprint B5-1. Registration window control — the downstream complement to
+  // SOATERM. Window records stored in SFRRGCL (one row per term + level/type
+  // combination). Cannot be finalized until SOATERM + DRC-2 are resolved.
+  sfarctl: {
+    code: "OC-2.4.2",
+    product: "Banner SaaS",
+    title: "SFARCTL · Registration Window Control",
+    summary: "Define per-cohort registration windows for each term — when each student group can open their shopping carts, which parts-of-term the windows apply to, and how priority ordering flows from graduate down to nondegree. SFARCTL is the downstream complement to SOATERM: SOATERM defines the term; SFARCTL defines who registers and when. Window records are stored in SFRRGCL. DRC-3 (graduate vs undergrad separation) must be resolved before this OC can be finalized.",
+    sections: [
+      {
+        id: "overview", num: "01", title: "Overview & decisions",
+        intro: "SFARCTL extends SOATERM by mapping cohorts to registration date ranges. Each record in SFRRGCL binds a term code, a level code (GR/UG), and optionally a student-type code and part-of-term code to a begin and end date. A NULL level code creates a catch-all window for all students; a NULL SFRRGCL_PIDM means the row is a cohort rule (vs. an individual student override). SFARCTL cannot be completed until SOATERM is saved and DRC-2 (parts-of-term structure) is resolved — window records that reference undefined PoT codes hard-error on save.",
+        callouts: [
+          { kind: "watchout", text: "SFARCTL depends on SOATERM. Complete SOATERM and resolve DRC-2 (parts-of-term) before entering any SFARCTL records. Entering window records before PoT structure is confirmed means re-work." },
+          { kind: "best-practice", from: "Inner-source · term-rollover.sh", text: "Use the term-rollover.sh script to forward-roll SFRRGCL records from the prior year. It advances dates by 52 weeks and flags cohort rows with no matching student population in the current term — a common rollover drift item that otherwise surfaces as 'no open registration window' errors in week one." },
+        ],
+      },
+      {
+        id: "cohorts", num: "02", title: "Cohort window records",
+        intro: "Each cohort needs one SFRRGCL row per term (or per part-of-term if PoT-scoped). Priority is implicit in level/type matching: graduate rows are checked first because GR-level students are excluded from UG-level rows. Build rows in descending priority order — GR first, then UG by class standing. DRC-3 is open: the graduate dean is requesting a separate GR window; the registrar is weighing a simpler single-window approach.",
+        steps: [
+          {
+            num: 1, title: "Enter graduate registration window",
+            body: "Graduate students at NSU have historically opened 2–4 weeks ahead of undergrad. Carry the prior-year precedent (April 1 for GR, April 15 for UG seniors) unless DRC-3 changes the approach.",
+            fields: [
+              { field: "SFRRGCL_TERM_CODE",  value: "202610",           why: "Fall 2026 term" },
+              { field: "SFRRGCL_LEVL_CODE",  value: "GR",               why: "Graduate cohort — matches all GR-level students" },
+              { field: "SFRRGCL_STYP_CODE",  value: "(blank)",          why: "NULL = all student types within GR level" },
+              { field: "SFRRGCL_BEGIN_DATE", value: "2026-04-01 09:00", why: "Priority open — 4 weeks before first UG cohort" },
+              { field: "SFRRGCL_END_DATE",   value: "2026-08-23 23:59", why: "Closes day before term start; matches all UG rows" },
+              { field: "SFRRGCL_PTRM_CODE",  value: "(blank)",          why: "NULL = window applies to any part-of-term" },
+            ],
+          },
+          {
+            num: 2, title: "Enter undergraduate cohort windows",
+            body: "Build one row per UG priority group. Stagger begin dates by 7 days; all groups share the same end date. STVSTYP codes (student type) are institution-defined; NSU uses S/J/SO/FR/N for Senior/Junior/Sophomore/Freshman/Nondegree. DRC-3 open — confirm UG cohort split with registrar before saving.",
+            code: `-- Inner-source: NSU-Term-2025 / reg-window-pattern (UG cohort batch)
+-- Prerequisites: SOATERM 202610 saved · DRC-2 resolved · DRC-3 confirmed
+-- STVSTYP codes are NSU-defined: S=Senior J=Junior SO=Sophomore FR=Freshman N=Nondegree
+INSERT INTO sfrrgcl
+  (sfrrgcl_term_code, sfrrgcl_levl_code, sfrrgcl_styp_code,
+   sfrrgcl_begin_date, sfrrgcl_end_date, sfrrgcl_ptrm_code, sfrrgcl_pidm)
+SELECT '202610','UG','S',
+  TO_DATE('2026-04-15 09:00','YYYY-MM-DD HH24:MI'),
+  TO_DATE('2026-08-23 23:59','YYYY-MM-DD HH24:MI'), NULL, NULL FROM dual
+UNION ALL
+SELECT '202610','UG','J',
+  TO_DATE('2026-04-22 09:00','YYYY-MM-DD HH24:MI'),
+  TO_DATE('2026-08-23 23:59','YYYY-MM-DD HH24:MI'), NULL, NULL FROM dual
+UNION ALL
+SELECT '202610','UG','SO',
+  TO_DATE('2026-04-29 09:00','YYYY-MM-DD HH24:MI'),
+  TO_DATE('2026-08-23 23:59','YYYY-MM-DD HH24:MI'), NULL, NULL FROM dual
+UNION ALL
+SELECT '202610','UG','FR',
+  TO_DATE('2026-05-06 09:00','YYYY-MM-DD HH24:MI'),
+  TO_DATE('2026-08-23 23:59','YYYY-MM-DD HH24:MI'), NULL, NULL FROM dual
+UNION ALL
+SELECT '202610','UG','N',
+  TO_DATE('2026-05-13 09:00','YYYY-MM-DD HH24:MI'),
+  TO_DATE('2026-08-23 23:59','YYYY-MM-DD HH24:MI'), NULL, NULL FROM dual;`,
+            codeLang: "sql",
+          },
+        ],
+        tasks: [
+          { id: "NSU-187", title: "Resolve DRC-3: graduate vs undergrad window separation", priority: "P1", due: "Today" },
+        ],
+      },
+      {
+        id: "pot-scope", num: "03", title: "Part-of-term scoping",
+        intro: "If NSU adopts the 4-PoT block layout (Full / Half-A / Half-B / Late-start), registration windows can be scoped per part-of-term via SFRRGCL_PTRM_CODE. A student registering for Half-B sections only sees their Half-B window dates; Full-term sections use the PoT-1 (full-term) window. Leaving SFRRGCL_PTRM_CODE NULL creates a term-wide catch-all that applies to any part-of-term. DRC-2 must be signed before PoT-specific rows are entered.",
+        callouts: [
+          { kind: "watchout", text: "A NULL SFRRGCL_PTRM_CODE row is a catch-all — it allows registration into any PoT during that date range. If Half-B students need a later open date, you must create a separate SFRRGCL row scoped to PTRM_CODE = HB. Without it, a sophomore registered for Half-B can open their cart during the senior window." },
+          { kind: "pattern", from: "NSU-Term-2025 inner source", text: "WIU used a two-row-per-cohort model: one NULL PoT row covering Full/Half-A combined, one HB-scoped row for Half-B with a later begin date. Late-start enrollees were handled via individual PIDM overrides rather than a fourth cohort row. Promotes cleanly as 'pot-window-split-v1'." },
+        ],
+      },
+      {
+        id: "individual-overrides", num: "04", title: "Individual student overrides",
+        intro: "Any student can receive an individual registration override by setting SFRRGCL_PIDM to their Banner PIDM. A PIDM-level row takes precedence over any cohort-level row for the same term. The registrar's office typically manages these for late admits, academic appeals, and hold-lifted students. Establish who can enter individual SFRRGCL rows and how they are audited before go-live — unreviewed PIDM rows from a prior year are the most common source of 'student can register when they shouldn't' incidents.",
+        callouts: [
+          { kind: "best-practice", text: "Run a SFRRGCL audit query at end-of-registration each term: select all rows where SFRRGCL_PIDM is not NULL and SFRRGCL_END_DATE is past. Purge rows more than one year old. Most institutions carry hundreds of stale individual-override rows that accumulate silently." },
+        ],
+      },
+      {
+        id: "registration-flags", num: "05", title: "Registration flags & add/drop",
+        intro: "The master web-registration and voice-response (RVT) switches live on SOATERM. SFARCTL refines registration behavior at the cohort level: add-only, drop-only, or standard add-and-drop windows can be configured independently per cohort row. Confirm the flag matrix with the registrar before go-live — nondegree students at some institutions are restricted to add-only for the first week.",
+        callouts: [
+          { kind: "watchout", text: "If SOATERM's master web-reg switch is OFF, cohort-level SFARCTL flags have no effect — the master switch gates everything. Always verify the SOATERM web-reg flag is active before testing cohort-level behavior in SFARCTL." },
+          { kind: "best-practice", text: "Default nondegree cohort to add-only for weeks 1–2. Nondegree students unfamiliar with the system drop courses accidentally at a materially higher rate than degree-seeking students. The add-only restriction is a cheap guardrail that the registrar can lift manually for exceptions." },
+        ],
+      },
+      {
+        id: "validation", num: "06", title: "Validation & sign-off",
+        intro: "Before sign-off, verify: (1) no date gaps between cohort windows for any level/type combination — a gap locks all students out; (2) graduate window opens strictly before the first undergraduate window; (3) all SFRRGCL_PTRM_CODE values reference existing SOBPTRM records for the term. Run the autopilot baseline check. Sign-off requires DRC-3 resolution and a registrar e-signature confirming window dates.",
+      },
+    ],
+  },
+
+  // ── SPAIDEN ───────────────────────────────────────────────────────────────
+  // Sprint B5-2. General Person Identification — the canonical person record.
+  // Every Banner module FKs back to SPRIDEN PIDM. LEGACY-PIDM continuity
+  // (retain existing PIDMs vs. allow regeneration) is the highest-stakes call.
+  spaiden: {
+    code: "OC-3.1.1",
+    product: "Banner SaaS",
+    title: "SPAIDEN · Person Identification",
+    summary: "Establish the canonical person-record structure for Northern State University's Banner SaaS environment. Every Banner module — Student, HR, Finance, Financial Aid — foreign-keys back to a SPRIDEN PIDM. SPAIDEN governs ID generation strategy, name-typing conventions, address and contact setup, and IPEDS demographic data. In a SaaS migration, the LEGACY-PIDM continuity decision (retain existing PIDMs vs. allow regeneration) is the highest-stakes configuration call for this OC — it is a one-way door.",
+    sections: [
+      {
+        id: "overview", num: "01", title: "Overview & decisions",
+        intro: "SPAIDEN is the entry point for all person records in Banner. The underlying SPRIDEN table holds name and ID data; supplemental demographics live on SPBPERS; addresses on SPRADDR; telephones on SPRTELE; emails on GOREMAL. Every person — students, employees, vendors, emergency contacts — is anchored by a system-assigned PIDM (a non-recyclable integer). Four decisions drive this OC for NSU: (1) Banner ID format and auto-generation sequence, (2) LEGACY-PIDM preservation from the prior self-hosted instance, (3) name-type conventions for GTVNTYP, (4) gender-value convention for SPBPERS_SEX.",
+        callouts: [
+          { kind: "watchout", text: "LEGACY-PIDM continuity is a one-way door. If PIDMs are not preserved during the SaaS migration, every integration, legacy report, and third-party system referencing Banner PIDMs becomes orphaned on cutover day. The standard Ellucian SaaS migration path preserves PIDMs — deviate only with a documented, change-control-approved reason." },
+          { kind: "best-practice", from: "Inner-source · 18 engagements", text: "Configure all validation tables — GTVNTYP (name types), STVATYP (address types), STVTELE (telephone types), GTVEMAL (email types) — before creating any SPAIDEN records. An entry that references an undefined validation code hard-errors on save. Twenty minutes of validation-table setup prevents hours of re-entry." },
+        ],
+      },
+      {
+        id: "id-strategy", num: "02", title: "ID strategy & PIDM continuity",
+        intro: "Banner assigns two identifiers to each person: the PIDM (system integer, internal-only, never displayed to users) and the Banner ID (SPRIDEN_ID, the institution-facing number on cards, transcripts, and portals). For NSU's SaaS migration, the Banner ID format (8-digit institutional number) is carried forward unchanged. For new persons created post-migration, Banner auto-generates from the sequence configured in GUAIDEN — confirm the starting sequence value is above the current conversion maximum to prevent ID collision.",
+        steps: [
+          {
+            num: 1, title: "Confirm ID format and generation method",
+            body: "The Banner ID appears on SPRIDEN as SPRIDEN_ID. NSU has used 8-digit IDs since 1998; the SaaS migration preserves these. For new-record creation, the auto-generation sequence must be set above the current maximum to prevent collision with converted records.",
+            fields: [
+              { field: "SPRIDEN_ID",         value: "(8-digit NSU number)",  why: "Carry forward — do not reformat on migration" },
+              { field: "SPRIDEN_CHANGE_IND",  value: "C",                    why: "C = current record · I = inactive (name-change history)" },
+              { field: "SPRIDEN_ENTITY_IND",  value: "P",                    why: "P = person · C = corporation/non-person entity" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "name-types", num: "03", title: "Name types & naming conventions",
+        intro: "Banner supports multiple name records per PIDM via GTVNTYP (Name Type validation table). Each SPRIDEN row with a non-null SPRIDEN_NTYP_CODE is a named-type overlay on the primary (null NTYP) record — the primary record is the legal name used for IPEDS and legal documents. NSU must decide how many name types to maintain and whether preferred-name display in SSB is active from day one of go-live.",
+        callouts: [
+          { kind: "best-practice", text: "Activate preferred-name display (GTVNTYP PREFERRED) in SSB before go-live. Students notice immediately when the system shows their legal name in contexts where they expect their chosen name. Retrofitting after go-live requires an SSB config change and a student communication — preventable if done at initial setup." },
+          { kind: "watchout", text: "SSN is not stored on SPRIDEN. It lives on SPBPERS_SSN and is subject to FERPA masking rules. Never use a SPRIDEN field for SSN storage — SPRIDEN is not encrypted and SSN values are visible in standard name-query forms." },
+        ],
+        steps: [
+          {
+            num: 2, title: "Set up GTVNTYP name types",
+            body: "Open GTVNTYP and verify the following name types exist before creating any SPAIDEN records. These are institution-controlled validation-table rows — add any that are missing.",
+            fields: [
+              { field: "GTVNTYP_CODE", value: "LEGAL",     why: "Legal name — IPEDS reporting, transcripts, diplomas" },
+              { field: "GTVNTYP_CODE", value: "PREFERRED",  why: "Preferred/chosen name — SSB display, grade distributions, rosters" },
+              { field: "GTVNTYP_CODE", value: "FORMER",     why: "Former/maiden name — dual-record matching, legal continuity" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "address-telephone", num: "04", title: "Address, telephone & email",
+        intro: "Contact records are stored on SPRADDR (addresses), SPRTELE (telephones), and GOREMAL (emails). Each record type requires a validation-table code (STVATYP, STVTELE, GTVEMAL respectively) and carries an activity date for recency-based address selection. The address-type hierarchy controls which address prints on billing statements, transcripts, and degree documents. Set this up before the first registration term — billing and transcript processes run at go-live and pull the primary address on their first execution.",
+        steps: [
+          {
+            num: 3, title: "Define address type hierarchy in STVATYP",
+            body: "Open STVATYP and confirm the address types NSU will use. The STVATYP_DISP_SEQ column sets the display and fallback order when multiple active addresses exist for the same person. Billing, transcript, and degree address preferences may override this at the process level, but STVATYP_DISP_SEQ is the institution-wide default fallback.",
+            fields: [
+              { field: "STVATYP_CODE", value: "MA",  why: "Mailing — primary for billing statements" },
+              { field: "STVATYP_CODE", value: "PR",  why: "Permanent/home — IPEDS residency, transcripts" },
+              { field: "STVATYP_CODE", value: "BU",  why: "Business — employee contact records for HR module" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "demographics", num: "05", title: "Demographics & compliance data",
+        intro: "IPEDS and federal compliance demographic data is stored on SPBPERS. The critical fields are race/ethnicity (GORRACE mapping + SPBPERS_ETHN_CODE), citizenship (SPBPERS_CITZ_CODE), and gender (SPBPERS_SEX). NSU must confirm the gender-value convention before go-live — specifically whether to activate Banner's N (non-binary) value in SPBPERS_SEX alongside the standard M/F values.",
+        callouts: [
+          { kind: "watchout", text: "IPEDS reports race/ethnicity using the federal two-category format (Hispanic/not Hispanic, then one of 7 race categories). Banner's GORRACE table allows finer-grained institution sub-categories, but the IPEDS extract collapses them. Do not create sub-category race codes that break the GORRACE ↔ IPEDS mapping — it causes IPEDS submission errors that are expensive to remediate mid-cycle." },
+          { kind: "best-practice", text: "Set a default citizenship code (typically US) in enrollment processes rather than leaving SPBPERS_CITZ_CODE NULL. Not all self-service enrollment flows require citizenship entry; a NULL value causes downstream FA eligibility errors that surface weeks after go-live." },
+        ],
+        steps: [
+          {
+            num: 4, title: "Review SPBPERS demographic defaults",
+            body: "SPBPERS is a one-row-per-PIDM supplemental table. Confirm the allowed values and any institution defaults for each demographic field with Admissions/Registrar (for students) and HR (for employees).",
+            fields: [
+              { field: "SPBPERS_SEX",        value: "M / F / N / U",  why: "M=Male F=Female N=Non-binary U=Unknown — confirm N activation with NSU policy" },
+              { field: "SPBPERS_BIRTH_DATE",  value: "(enter date)",   why: "Required for FA identity match (ISIR); redact in legacy exports per FERPA" },
+              { field: "SPBPERS_CITZ_CODE",   value: "US",             why: "Most common; NULL causes FA eligibility errors for domestic students" },
+              { field: "SPBPERS_ETHN_CODE",   value: "(STVETHN code)", why: "Federal two-category ethnicity; institution sub-categories via GORRACE" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "validation", num: "06", title: "Validation & sign-off",
+        intro: "Run duplicate-detection verification before finalizing person-record configuration. Banner's duplicate-detection logic uses SPRIDEN_SEARCH_LAST_NAME (soundex-normalized), birth date, and SSN in combination. Confirm with Admissions and HR that the duplicate-match threshold is appropriate — too permissive and every common surname triggers a false match; too restrictive and true duplicates slip through to become phantom-PIDM incidents post-go-live. Run the autopilot baseline check after the first batch of conversion records loads.",
+        callouts: [
+          { kind: "watchout", text: "Autopilot run #282 flagged TC-7 failed: birth-date-redaction in legacy export. A legacy batch job is pulling SPBPERS_BIRTH_DATE unmasked. Assign remediation to Marisol before go-live — this is a FERPA exposure, not a cosmetic issue." },
+        ],
+      },
+    ],
+  },
+
 };
 
 export const AUTOPILOT_RUNS = [
@@ -726,6 +942,70 @@ export const CONFIG_FIELDS_BY_OC: Record<string, Record<string, ConfigField[]>> 
         fieldCode: "AUTOPILOT_BASELINE", label: "Autopilot baseline check",
         recommendedValue: "Run after every save",
         notes: "Run #284 · 12 cases · 11 pass · 1 skip" },
+    ],
+  },
+
+  // ── SFARCTL config fields ─────────────────────────────────────────────────
+  sfarctl: {
+    cohorts: [
+      { id: "sf-gr-begin", ocId: "sfarctl", sectionId: "cohorts",
+        fieldCode: "SFRRGCL_BEGIN_DATE (GR)", label: "Graduate window open",
+        recommendedValue: "2026-04-01 09:00",
+        notes: "4 weeks before first UG cohort · carry from Fall 2025 precedent" },
+      { id: "sf-ug-begin", ocId: "sfarctl", sectionId: "cohorts",
+        fieldCode: "SFRRGCL_BEGIN_DATE (UG)", label: "UG senior window open",
+        recommendedValue: "2026-04-15 09:00",
+        notes: "Stagger each cohort by 7 days · DRC-3 pending — confirm split vs. single-window" },
+      { id: "sf-levl", ocId: "sfarctl", sectionId: "cohorts",
+        fieldCode: "SFRRGCL_LEVL_CODE", label: "Level-code separation",
+        recommendedValue: "GR / UG (separate rows)",
+        notes: "DRC-3 open — graduate dean requests separate GR window; registrar weighing simpler single-window" },
+    ],
+    "pot-scope": [
+      { id: "sf-ptrm", ocId: "sfarctl", sectionId: "pot-scope",
+        fieldCode: "SFRRGCL_PTRM_CODE", label: "Part-of-term scoping",
+        recommendedValue: "(blank) = all PoT",
+        notes: "NULL is term-wide catch-all; add PoT-scoped rows if Half-B requires a separate window open date" },
+    ],
+  },
+
+  // ── SPAIDEN config fields ─────────────────────────────────────────────────
+  spaiden: {
+    "id-strategy": [
+      { id: "sp-id-format", ocId: "spaiden", sectionId: "id-strategy",
+        fieldCode: "SPRIDEN_ID", label: "Banner ID format",
+        recommendedValue: "8-digit institutional number",
+        notes: "Carry forward from prior Banner instance — no reformatting on SaaS migration" },
+      { id: "sp-entity", ocId: "spaiden", sectionId: "id-strategy",
+        fieldCode: "SPRIDEN_ENTITY_IND", label: "Entity indicator",
+        recommendedValue: "P (persons) · C (organizations)",
+        notes: "P = person; C = corp/non-person; never mix entity types on same PIDM" },
+    ],
+    "name-types": [
+      { id: "sp-ntyp", ocId: "spaiden", sectionId: "name-types",
+        fieldCode: "GTVNTYP_CODE", label: "Name types required",
+        recommendedValue: "LEGAL · PREFERRED · FORMER",
+        notes: "LEGAL for IPEDS/legal docs; PREFERRED for SSB display; FORMER for name-change history" },
+    ],
+    "address-telephone": [
+      { id: "sp-atyp", ocId: "spaiden", sectionId: "address-telephone",
+        fieldCode: "STVATYP_CODE", label: "Address types",
+        recommendedValue: "MA · PR · BU",
+        notes: "MA=Mailing (billing); PR=Permanent (IPEDS/transcript); BU=Business (HR records)" },
+    ],
+    demographics: [
+      { id: "sp-sex", ocId: "spaiden", sectionId: "demographics",
+        fieldCode: "SPBPERS_SEX", label: "Gender value convention",
+        recommendedValue: "M / F / N (confirm N with NSU)",
+        notes: "N=Non-binary available in Banner; confirm NSU policy before go-live. U=Unknown is fallback." },
+      { id: "sp-citz", ocId: "spaiden", sectionId: "demographics",
+        fieldCode: "SPBPERS_CITZ_CODE", label: "Default citizenship",
+        recommendedValue: "US",
+        notes: "NULL causes FA eligibility errors; set US as default for domestic-only enrollment flows" },
+      { id: "sp-birth", ocId: "spaiden", sectionId: "demographics",
+        fieldCode: "SPBPERS_BIRTH_DATE", label: "Birth-date export handling",
+        recommendedValue: "Redact in all legacy batch exports",
+        notes: "TC-7 failed in autopilot run #282 — legacy job pulling SPBPERS_BIRTH_DATE unmasked. FERPA exposure. Assign to Marisol." },
     ],
   },
 };

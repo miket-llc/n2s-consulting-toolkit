@@ -1189,7 +1189,7 @@ export function ConfigurationGuidePage({ ocId }: { ocId: string }) {
   const [, navigate] = useHash();
   const { currentProject } = useApp();
   const oc = ocIndex().find(o => o.id === ocId);
-  const data = (OC_DATA && (ocId === "soaterm" || !ocId)) ? OC_DATA : null;
+  const data = ocId ? (OC_DATA[ocId] ?? null) : (OC_DATA["soaterm"] ?? null);
 
   // Sections: prefer OC_DATA. Fallback to a stub for non-SOATERM OCs.
   const sections: GuideSection[] = (data?.sections as GuideSection[] | undefined) || [
