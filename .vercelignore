@@ -1,0 +1,14 @@
+# Vercel ignore — exclude assets that shouldn't ship in the deploy artifact.
+
+# Methodology / planning source material (kept local, not deployed)
+docs/*.xlsx
+docs/*.xlsm
+
+# Agent memory + plans — author tooling, not user-facing
+.claude/
+
+# Local scripts — smoke runs against local builds, not the deployed bundle
+scripts/
+
+# Reference design tarballs / source briefs (kept local)
+/tmp/

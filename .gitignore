@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# methodology / planning source material (kept locally, not versioned)
+docs/*.xlsx
+docs/*.xlsm

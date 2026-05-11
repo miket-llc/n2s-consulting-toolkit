@@ -25,51 +25,61 @@ Other scripts:
 ```text
 app/
   page.tsx             — root client component; hash routing + default-landing
-  layout.tsx           — root HTML, font import, theme-light default class
+  layout.tsx           — root HTML, font imports, pre-paint theme script
+  error.tsx            — top-level render-error boundary
+  not-found.tsx        — 404 fallback
+  loading.tsx          — loading skeleton
   styles/
     tokens.css         — design tokens: light + dark Ellucian palette, type scale
-    styles.css         — legacy v1 stylesheet (kept; unused by v2)
-    v2.css             — v2 surface styles (imports tokens.css)
+    styles.css         — legacy v1 stylesheet (kept; unused by v2; slated for cull post-audit)
+    v2.css             — v2 surface styles (imports tokens.css + detail.css)
+    detail.css         — Capability detail + Configuration guide styles
 components/
   v2/                  — the live surface (mounted by app/page.tsx)
-    shell.tsx          — TopBar, ProjectSwitcher, Rail, PageShell, hooks (useHash, useApp), notImplemented + ToastHost, PageHero, BriefBody, Section, ThreeThings, Coming
+    shell.tsx          — TopBar, ProjectSwitcher, Rail, PageShell, hooks (useHash, useApp), notImplemented + ToastHost, PageHero, BriefBody, Section, ThreeThings, Coming, SchoolLogo
     practice.tsx       — Practice home (Portfolio): brief, three-things, project cards, today-across
     home.tsx           — Project home: phase ribbon, stage detail, calendar view
-    pages.tsx          — secondary pages: MyWork, Decisions, Workshops, Schedule, Capabilities, Methodology, Ask, Autopilot, Settings, Guides
+    pages.tsx          — secondary pages: MyWork (Buckets|Board toggle), Decisions, Workshops, Schedule (12-month gantt), Capabilities, Methodology, Ask (coming-soon stub), Autopilot, Settings, Guides
+    detail.tsx         — Capability detail (#capabilities/<capId>) + Configuration guide (#guides/<ocId>) with per-section ConfigFieldsTable
     icons.tsx          — inline SVG icon set (~50 icons, 1.25–1.5px stroke)
   views/               — legacy v1 surface (NOT mounted; see "Legacy v1" below)
   shell.tsx            — legacy v1 shell (not mounted)
   icons.tsx            — legacy v1 icons (not mounted)
   tweaks-panel.tsx     — legacy v1 design-time tweaks panel (not mounted)
 lib/
-  data.ts              — single mock dataset (engagement, portfolio, capabilities,
-                         OCs, DRCs, workshops, milestones, autopilot runs, methodology)
+  data.ts              — single typed mock dataset (engagement, portfolio, capabilities, OCs, DRCs, workshops, milestones, autopilot runs, methodology, config fields)
   brief.ts             — time- and scope-aware brief composer (practice + project, morning/afternoon/wrap)
+  school-brands.ts     — per-school monogram styling (font, color) for SchoolLogo fallback
 public/
   ellucian-wordmark.png
 scripts/
   smoke.sh             — build + start + curl smoke test (run via `pnpm smoke`)
+docs/
+  MVP-PILOT-PLAN.md    — current sprint plan (Sprint A → C, with calendar + risk register)
+  audits/              — drift-audit reports (DRIFT-AUDIT-YYYY-MM-DD.md)
 ```
 
 ## Routes (v2)
 
 Hash-routed in `app/page.tsx`. All routes mount v2 components.
 
-| Hash             | Page                                     |
-| ---------------- | ---------------------------------------- |
-| `` (empty hash)  | Practice home (`PracticeHome`)           |
-| `#project`       | Project home for current engagement      |
-| `#mywork`        | My work — cross-engagement queue         |
-| `#decisions`     | Client decisions (DRCs)                  |
-| `#guides`        | Configuration guides (OC index)          |
-| `#capabilities`  | Capabilities by area                     |
-| `#schedule`      | Go-lives ahead                           |
-| `#workshops`     | Workshops · upcoming + past              |
-| `#library`       | Methodology · Pathfinder phases          |
-| `#ai`            | Ask the assistant                        |
-| `#autopilot`     | Configuration Autopilot                  |
-| `#settings`      | Preferences (theme + launch screen)      |
-| anything else    | `Coming` placeholder                     |
+| Hash                            | Page                                                                      |
+| ------------------------------- | ------------------------------------------------------------------------- |
+| `` (empty hash)                 | Practice home (`PracticeHome`)                                            |
+| `#project`                      | Project home for current engagement                                       |
+| `#mywork`                       | My work — cross-engagement queue with Buckets \| Board view toggle        |
+| `#decisions`                    | Client decisions (DRCs)                                                   |
+| `#guides`                       | Configuration guides (OC index)                                           |
+| `#guides/<ocId>`                | Configuration guide detail — walk-steps + per-section ConfigFieldsTable   |
+| `#capabilities`                 | Capabilities by area                                                      |
+| `#capabilities/<capId>`         | Capability detail — Delivery / Decisions / Budget tabs                    |
+| `#schedule`                     | Go-live readiness band + 12-month milestone gantt                         |
+| `#workshops`                    | Workshops · upcoming + past                                               |
+| `#library`                      | Methodology · Pathfinder phases                                           |
+| `#ai`                           | Ask the assistant (coming-soon stub for current pilot)                    |
+| `#autopilot`                    | Configuration Autopilot                                                   |
+| `#settings`                     | Preferences (theme + launch screen)                                       |
+| anything else                   | `Coming` placeholder                                                      |
 
 ### Default landing
 
@@ -77,9 +87,11 @@ The toolkit honours a `v2.defaultLanding` localStorage preference (`practice` or
 
 ## Interactions
 
-- **Theme toggle** in the top bar (sun/moon). Persists to `localStorage` as `v2.theme`.
+- **Theme toggle** in the top bar (sun/moon). Persists to `localStorage` as `v2.theme`. A pre-paint script in `app/layout.tsx` flips the html class before React hydrates, so dark-mode users don't see a light flash on cold load.
 - **Project switcher** in the top bar (left of search). Selecting an engagement persists to `localStorage` and navigates to `#project`.
-- **⌘K / Ctrl-K** focuses the toolkit search input. The input is currently a placeholder — search is not wired to data.
+- **⌘K / Ctrl-K** focuses the toolkit search input. The input is currently a placeholder — search is not wired to data yet.
+- **MyWork view toggle**: Buckets (Today / Tomorrow / This week / Later) or Board (5 status columns: Backlog / Ready / In Progress / Needs Review / Done). Choice persists to `localStorage` as `v2.mywork.view`.
+- **Configuration Guide review state**: per-field two-state review (unreviewed / confirmed) on the ConfigFieldsTable inside `#guides/<ocId>`. Persists to `localStorage` as `v2.cfg.<engagementId>.<ocId>.<fieldId>`.
 - **Decisions attention chip** appears top-right when there are open DRCs; "stuck 5+ days" gets a rose-tinted dot.
 - **Toast feedback (`notImplemented`)**: every secondary destination that does not yet have a real detail view (open Jira ticket, open OC guide section, open workshop, etc.) flashes a bottom-right toast describing what would happen. Replaces alert() dialogs so the prototype is demo-safe.
 
@@ -93,10 +105,10 @@ The portfolio in `PORTFOLIO` includes 8 engagements; NSU is the default. Other e
 
 Earlier sprint built a different surface under `components/views/*`, `components/shell.tsx`, `components/icons.tsx`, and `components/tweaks-panel.tsx`. v2 replaced it. The legacy files are kept in tree because:
 
-1. The May 15 drift-audit (`design-fidelity-guardian`) maps the source design tarball at `https://api.anthropic.com/v1/design/h/fIMotZmRLqVfGyaje-CA1g` 1:1 to the legacy `views-*.jsx` files. v2 has no source-tarball counterpart yet.
-2. Until the user re-anchors the audit baseline (either re-export v2 from Claude Design, or accept that the audit runs against v1), the legacy code is the only thing the audit can compare against.
+1. The May 15 drift-audit baseline is the design tarball at `https://api.anthropic.com/v1/design/h/CgM4C5b7mEU63Y2RQISWcw`, which **does** ship `v2/*.jsx` as the active design. v2 in this port maps to `project/v2/*` in the tarball; the legacy `views-*.jsx` set lives under `project/v1-archive/` in the tarball and corresponds to the unmounted `components/views/*` here.
+2. Three surfaces shipped 2026-05-11 — MyWork kanban toggle, Schedule 12-month gantt, Configuration Guide config-fields table — are intentional toolkit-original additions with no tarball counterpart. They are documented at `.claude/agent-memory/design-fidelity-guardian/project_toolkit_original_additions.md` so the audit classifies them as intentional, not drift.
 
-When the audit baseline is settled, the legacy files can be removed in one commit. Until then, treat them as reference-only — do not import them from anywhere v2-mounted.
+When the audit baseline is re-anchored to v2-only (current default per [docs/MVP-PILOT-PLAN.md](docs/MVP-PILOT-PLAN.md) Q4), the legacy files (`components/views/*`, root-level `components/{shell,icons,tweaks-panel}.tsx`, `app/styles/styles.css` — ~3,800 lines total) can be removed in one commit. Until then, treat them as reference-only — do not import them from anywhere v2-mounted.
 
 ## Tech
 
