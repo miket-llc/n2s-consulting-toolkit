@@ -12,6 +12,12 @@ Build is green (`pnpm next build`). Smoke test passes (`pnpm smoke`).
 
 ## Recently shipped
 
+**2026-05-12 — Work Products entity (Path B fork resolved):**
+- User answered the architecture fork: **Path B — toolkit stays independent** of `n2s-heear-editor` (read API) and `n2s-active-playbook` (work-product markdown source). Rationale: 8/3 pilot date holds, no re-keying of methodology-guru's just-shipped SFARCTL/SPAIDEN content, no two-project integration dependency. Trade-off accepted: toolkit's mock world diverges permanently from canonical taxonomy unless someone bridges later. Decision log at `.claude/agent-memory/chief-architect/project_workproducts_path_b_decision_2026_05_12.md`.
+- `lib/data.ts` — added `WorkProduct` type (+ `WorkProductPhase`, `WorkProductState`, `RaciRole`, `CapabilityRef` types and `WORK_PRODUCT_STATES` / `WORK_PRODUCT_STATE_LABELS` helpers). Methodology-side fields mirror active-playbook's `schemas/work-product.js` verbatim; runtime fields (engagement scope + state + due + linked-OC/DRC) are toolkit-specific. **`WORK_PRODUCTS` seeded by methodology-guru with 17 entries** spanning NSU + WIU + CSU EB across all 6 phases (5 signed / 5 in-progress / 2 needs-review / 4 not-started / 1 blocked).
+- **Engagement id-space coherence** (chief-architect's recommendation, ratified by user 2026-05-12 AM): flipped `PORTFOLIO[].id` from sequential codes (`p1...p8`) to slugs (`nsu`, `wiu`, `csu-eb`, `usc`, `uvm`, `lafayette`, `oakland`, `coastline-cc`); restored slug-based `engagement_id` values in `WORK_PRODUCTS`. `ENGAGEMENT.id`, `PORTFOLIO[].id`, and `WORK_PRODUCTS[].engagement_id` now share one convention. Build + smoke green. Only residual: `TASKS[].project` is free-text display labels ("NSU", "WIU", "CSU EB") — not joinable; platform-engineer to treat as `engagements.display_short` in B1 rather than as ids.
+- Sprint B0 gained item **B0-8** (post-audit, lead-developer): WP seed + per-capability tab on `CapabilityDetailPage` + `#workproducts` portfolio kanban (5-lane, active-playbook shape) + `#workproducts/<id>` detail route. Closes the long-standing "STILL no view at the capability or work product level" gap.
+
 **2026-05-11 — Sprint A (pre-audit hygiene, in progress):**
 - Banner schema accuracy in `lib/data.ts` — `NBRPSN`→`NBAPOSN`, `FTVVEND`→`FTMVEND`, `STVTERM_POT_CODE`/`STVTERM_POT_CENSUS_IND` → `SOBPTRM_PTRM_CODE`/`SOBPTRM_CENSUS_DATE` (per `methodology-guru` review).
 - `FINDING_INDEX` STVMAJR/STVRESD labels corrected; selectors cleared (they were pointing to the wrong SOATERM section).

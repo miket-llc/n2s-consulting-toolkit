@@ -469,21 +469,21 @@ export const INNER_SOURCE = [
 ];
 
 export const PORTFOLIO = [
-  { id: "p1",  name: "Northern State University",         short: "Northern State",  product: "Banner SaaS",  tier: "Select",     phase: "Build",     nextGL: "May 24",  readiness: 78, sprint: "S1 · D4/10", health: "green",
+  { id: "nsu",  name: "Northern State University",         short: "Northern State",  product: "Banner SaaS",  tier: "Select",     phase: "Build",     nextGL: "May 24",  readiness: 78, sprint: "S1 · D4/10", health: "green",
     domain: "northern.edu",        logoUrl: "https://logo.clearbit.com/northern.edu",        logoColor: "#a32638", initials: "NS" },
-  { id: "p2",  name: "Western Illinois University",       short: "Western Illinois", product: "Banner SaaS",  tier: "Select",     phase: "Stabilize", nextGL: "Aug 1",   readiness: 92, sprint: "S6 · D7/10", health: "green",
+  { id: "wiu",  name: "Western Illinois University",       short: "Western Illinois", product: "Banner SaaS",  tier: "Select",     phase: "Stabilize", nextGL: "Aug 1",   readiness: 92, sprint: "S6 · D7/10", health: "green",
     domain: "wiu.edu",             logoUrl: "https://logo.clearbit.com/wiu.edu",             logoColor: "#4d2a7a", initials: "WIU" },
-  { id: "p3",  name: "CSU East Bay",                      short: "CSU East Bay",     product: "Banner SaaS",  tier: "Essentials", phase: "Build",     nextGL: "Jun 15",  readiness: 41, sprint: "S3 · D2/10", health: "amber",
+  { id: "csu-eb",  name: "CSU East Bay",                      short: "CSU East Bay",     product: "Banner SaaS",  tier: "Essentials", phase: "Build",     nextGL: "Jun 15",  readiness: 41, sprint: "S3 · D2/10", health: "amber",
     domain: "csueastbay.edu",      logoUrl: "https://logo.clearbit.com/csueastbay.edu",      logoColor: "#b51e2a", initials: "CSU" },
-  { id: "p4",  name: "University of South Carolina",      short: "South Carolina",   product: "Banner SaaS",  tier: "Advantage",  phase: "Discover",  nextGL: "Sep 30",  readiness: 18, sprint: "S0 · plan",  health: "green",
+  { id: "usc",  name: "University of South Carolina",      short: "South Carolina",   product: "Banner SaaS",  tier: "Advantage",  phase: "Discover",  nextGL: "Sep 30",  readiness: 18, sprint: "S0 · plan",  health: "green",
     domain: "sc.edu",              logoUrl: "https://logo.clearbit.com/sc.edu",              logoColor: "#73000a", initials: "SC" },
-  { id: "p5",  name: "University of Vermont",             short: "UVM",              product: "Banner SaaS",  tier: "Select",     phase: "Build",     nextGL: "Jun 1",   readiness: 36, sprint: "S2 · D8/10", health: "amber",
+  { id: "uvm",  name: "University of Vermont",             short: "UVM",              product: "Banner SaaS",  tier: "Select",     phase: "Build",     nextGL: "Jun 1",   readiness: 36, sprint: "S2 · D8/10", health: "amber",
     domain: "uvm.edu",             logoUrl: "https://logo.clearbit.com/uvm.edu",             logoColor: "#005f43", initials: "UVM" },
-  { id: "p6",  name: "Lafayette College",                 short: "Lafayette",        product: "Colleague",    tier: "Select",     phase: "Build",     nextGL: "Jul 20",  readiness: 64, sprint: "S4 · D3/10", health: "green",
+  { id: "lafayette",  name: "Lafayette College",                 short: "Lafayette",        product: "Colleague",    tier: "Select",     phase: "Build",     nextGL: "Jul 20",  readiness: 64, sprint: "S4 · D3/10", health: "green",
     domain: "lafayette.edu",       logoUrl: "https://logo.clearbit.com/lafayette.edu",       logoColor: "#640014", initials: "LC" },
-  { id: "p7",  name: "Oakland University",                short: "Oakland",          product: "Banner SaaS",  tier: "Essentials", phase: "Stabilize", nextGL: "May 10",  readiness: 88, sprint: "S5 · D9/10", health: "green",
+  { id: "oakland",  name: "Oakland University",                short: "Oakland",          product: "Banner SaaS",  tier: "Essentials", phase: "Stabilize", nextGL: "May 10",  readiness: 88, sprint: "S5 · D9/10", health: "green",
     domain: "oakland.edu",         logoUrl: "https://logo.clearbit.com/oakland.edu",         logoColor: "#000000", initials: "OU" },
-  { id: "p8",  name: "Coastline Community College",       short: "Coastline CC",     product: "Banner SaaS",  tier: "Select",     phase: "Build",     nextGL: "Aug 25",  readiness: 52, sprint: "S2 · D5/10", health: "green",
+  { id: "coastline-cc",  name: "Coastline Community College",       short: "Coastline CC",     product: "Banner SaaS",  tier: "Select",     phase: "Build",     nextGL: "Aug 25",  readiness: 52, sprint: "S2 · D5/10", health: "green",
     domain: "coastline.edu",       logoUrl: "https://logo.clearbit.com/coastline.edu",       logoColor: "#1d6fb8", initials: "CCC" },
 ];
 
@@ -548,6 +548,563 @@ export const METHODOLOGY_CARDS = [
   { id: "m15", phase: "deploy",   kind: "Ceremony",  title: "Go-Live War Room",                    desc: "Cutover weekend bridge. Hourly status, decision log, rollback decision points, exec broadcast cadence.",           when: "GL weekend", linked: ["War-room script"] },
   { id: "m16", phase: "stabilize", kind: "Artifact", title: "Hypercare Playbook",                  desc: "30/60/90-day stabilization model. Severity tiers, escalation paths, daily-then-weekly cadence to client BAU.",      when: "Wk 30–42", linked: ["Hypercare playbook"] },
   { id: "m17", phase: "stabilize", kind: "Ceremony", title: "Go-Live Retro & Promotion",           desc: "Run a retro inside two weeks of stabilization. Promote reusable patterns to Inner Source.",                       when: "Wk 32",   linked: ["Retro guide", "Promotion checklist"] },
+];
+
+// ── Work Products ────────────────────────────────────────────────────────────
+// Methodology deliverables tracked per-engagement-per-capability. Shape mirrors
+// active-playbook's WorkProductSchema (schemas/work-product.js) field-for-field
+// for the methodology-side fields (id, title, phase, stage, order, raci,
+// purpose_and_scope, definition_of_done, prerequisites, feeds_into,
+// capability_refs, applies_to). The runtime fields (engagement_id, state,
+// owner, due, linked_oc_ids, linked_drc_ids) are toolkit-specific — they live
+// on Task in active-playbook, but the consulting toolkit's pilot frame is
+// engagement-centric, so we materialize them on WorkProduct here.
+//
+// Path B decision (2026-05-12): toolkit keeps its own mock world. Field names
+// match active-playbook so a future bridge to the canonical catalog is a swap,
+// not a refactor. Stance B Drizzle schema (B1-2) will mirror this shape.
+//
+// Phase vocabulary is the toolkit's 6-phase model from METHODOLOGY_PHASES
+// (discover / design / build / validate / deploy / stabilize). Active-playbook
+// uses a slightly different phase taxonomy (build / optimize) but the entity
+// shape is the same.
+
+export type WorkProductPhase =
+  | "discover" | "design" | "build" | "validate" | "deploy" | "stabilize";
+
+export type WorkProductState =
+  | "not-started"
+  | "in-progress"
+  | "needs-review"
+  | "signed"
+  | "blocked";
+
+export type RaciRole = "R" | "A" | "C" | "I";
+
+export type CapabilityRef = {
+  domain: string;
+  capabilities?: string[];
+};
+
+export type WorkProduct = {
+  id: string;
+  title: string;
+  phase: WorkProductPhase;
+  stage: string;
+  order: number;
+  raci?: Record<string, RaciRole>;
+  purpose_and_scope?: string;
+  definition_of_done?: string;
+  exemptions?: string;
+  owner?: string;
+  prerequisites?: string[];
+  feeds_into?: string[];
+  capability_refs?: CapabilityRef[];
+  applies_to?: { products: string[] };
+  engagement_id: string;
+  capability_id?: string;
+  state: WorkProductState;
+  due?: string;
+  linked_oc_ids?: string[];
+  linked_drc_ids?: string[];
+};
+
+export const WORK_PRODUCT_STATES: WorkProductState[] = [
+  "not-started",
+  "in-progress",
+  "needs-review",
+  "signed",
+  "blocked",
+];
+
+export const WORK_PRODUCT_STATE_LABELS: Record<WorkProductState, string> = {
+  "not-started": "Not Started",
+  "in-progress": "In Progress",
+  "needs-review": "Needs Review",
+  "signed": "Signed",
+  "blocked": "Blocked",
+};
+
+export const WORK_PRODUCTS: WorkProduct[] = [
+
+  // ── NSU · Engagement-wide (Discover) ─────────────────────────────────────
+
+  {
+    id: "wp-nsu-charter",
+    title: "Engagement Charter",
+    phase: "discover",
+    stage: "discover-charter",
+    order: 1,
+    engagement_id: "nsu",
+    state: "signed",
+    owner: "cs",
+    due: "Apr 18, 2026",
+    purpose_and_scope:
+      "Defines engagement scope, governance structure, go-live timeline, team roles, and escalation paths for Northern State University's Banner SaaS Select implementation. Four go-live events are framed: HR/Payroll (May 24), Finance (Aug 18), Student Phase 1 (Nov 30), and Student Phase 2 (Mar 15, 2027).",
+    definition_of_done:
+      "Charter document signed by NSU Executive Sponsor and Ellucian Engagement Manager. Version 3 stored in SharePoint engagement library. All four go-live dates ratified and reflected in the Engagement Register.",
+    raci: {
+      "Lead Consultant": "A",
+      "PM": "R",
+      "Functional Lead": "C",
+      "Sponsor": "I",
+    },
+    capability_refs: [
+      { domain: "Student" },
+      { domain: "HR" },
+      { domain: "Finance" },
+      { domain: "Cross" },
+    ],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  {
+    id: "wp-nsu-raid-log",
+    title: "RAID Log",
+    phase: "discover",
+    stage: "discover-charter",
+    order: 2,
+    engagement_id: "nsu",
+    state: "in-progress",
+    owner: "cs",
+    due: "May 24, 2026",
+    purpose_and_scope:
+      "Living log of Risks, Actions, Issues, and Dependencies for the NSU engagement. Updated weekly by PM; reviewed in steering committee. Baseline populated during Sprint 0; entries added through each sprint as DRCs age, dependencies surface, and go-live risk profile shifts.",
+    definition_of_done:
+      "Log maintained with ≤7-day update cadence through HR Go-Live. All P1/P2 issues resolved or formally deferred before each cutover window. Final HR-GL snapshot signed off by Project Sponsor.",
+    raci: {
+      "PM": "R",
+      "Lead Consultant": "A",
+      "Functional Lead": "C",
+      "Sponsor": "I",
+    },
+    capability_refs: [
+      { domain: "Student" },
+      { domain: "HR" },
+      { domain: "Finance" },
+      { domain: "Cross" },
+    ],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  // ── NSU · Design phase — Blueprints & Configuration RACI ─────────────────
+
+  {
+    id: "wp-nsu-bb-hr-core",
+    title: "Business Blueprint · HR Core & Position",
+    phase: "design",
+    stage: "design-blueprint",
+    order: 1,
+    engagement_id: "nsu",
+    capability_id: "bc-hr-core",
+    state: "signed",
+    owner: "dl",
+    due: "Apr 22, 2026",
+    purpose_and_scope:
+      "Documents NSU's confirmed HR configuration decisions: ECLS combinations, position-control hierarchy, NBAPOSN structure, and ECLS-level routing for benefit deductions. Inner Source v3 position-control hierarchy applied with institution-specific overlays for GA and adjunct populations.",
+    definition_of_done:
+      "Blueprint document signed by NSU HRBP and Functional Lead. Position-control hierarchy v3 diagram embedded and version-controlled. All ECLS-to-benefit-deduction rules tabled and confirmed. DRC-6 resolved with client sign-off recorded.",
+    raci: {
+      "Functional Lead": "R",
+      "Lead Consultant": "A",
+      "PM": "C",
+      "Sponsor": "I",
+    },
+    prerequisites: ["wp-nsu-charter"],
+    feeds_into: ["wp-nsu-test-plan-hr-core", "wp-nsu-cutover-hr"],
+    linked_oc_ids: ["nbaposn"],
+    linked_drc_ids: ["DRC-6"],
+    capability_refs: [{ domain: "HR", capabilities: ["bc-hr-core"] }],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  {
+    id: "wp-nsu-config-raci-curriculum",
+    title: "Configuration RACI · Curriculum Management",
+    phase: "design",
+    stage: "design-blueprint",
+    order: 2,
+    engagement_id: "nsu",
+    capability_id: "bc-curriculum",
+    state: "signed",
+    owner: "jh",
+    due: "Apr 28, 2026",
+    purpose_and_scope:
+      "Defines responsibility, accountability, consultation, and information flows for each OC in the Curriculum Management scope. Covers SOATERM, SFARCTL, SSASECT, and SHACATQ. Agreed before Sprint 1 build work to prevent ambiguity on who enters configuration and who signs off.",
+    definition_of_done:
+      "RACI matrix reviewed and accepted by Registrar (C. Reyes), Lead Consultant (Janet Hawkins), and Functional Lead (Marisol Tovar). Stored alongside Business Blueprint v1 in engagement SharePoint. No OC left without an assigned Responsible party.",
+    raci: {
+      "Lead Consultant": "A",
+      "Functional Lead": "R",
+      "Tech Lead": "C",
+      "PM": "I",
+    },
+    prerequisites: ["wp-nsu-charter"],
+    linked_oc_ids: ["soaterm", "sfarctl", "ssasect", "shacatq"],
+    capability_refs: [{ domain: "Student", capabilities: ["bc-curriculum"] }],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  {
+    id: "wp-nsu-bb-curriculum",
+    title: "Business Blueprint · Curriculum Management",
+    phase: "design",
+    stage: "design-blueprint",
+    order: 3,
+    engagement_id: "nsu",
+    capability_id: "bc-curriculum",
+    state: "needs-review",
+    owner: "mt",
+    due: "May 16, 2026",
+    purpose_and_scope:
+      "Documents confirmed curriculum configuration scope: term-code conventions, parts-of-term block layout, catalog course structure, section-build rules, and course attribute framework. Anchors to SOATERM (OC-2.4.1) and SFARCTL (OC-2.4.2). DRC-2 (PoT split) must be resolved before the blueprint can be signed.",
+    definition_of_done:
+      "Blueprint signed by Registrar and Functional Lead. All in-scope OCs tabled with confirmed values or 'TBD — pending DRC' notation. DRC-2 decision recorded. Autopilot baseline updated to reflect signed blueprint.",
+    raci: {
+      "Functional Lead": "R",
+      "Lead Consultant": "A",
+      "PM": "C",
+      "Sponsor": "I",
+    },
+    prerequisites: ["wp-nsu-config-raci-curriculum"],
+    feeds_into: ["wp-nsu-test-plan-curriculum"],
+    linked_oc_ids: ["soaterm", "sfarctl", "ssasect", "shacatq", "stvattr"],
+    linked_drc_ids: ["DRC-1", "DRC-2", "DRC-5"],
+    capability_refs: [{ domain: "Student", capabilities: ["bc-curriculum"] }],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  {
+    id: "wp-nsu-bb-records",
+    title: "Business Blueprint · Student Records",
+    phase: "design",
+    stage: "design-blueprint",
+    order: 4,
+    engagement_id: "nsu",
+    capability_id: "bc-records",
+    state: "blocked",
+    owner: "jh",
+    due: "May 20, 2026",
+    purpose_and_scope:
+      "Documents confirmed student-records configuration scope: SPAIDEN person-identification rules, cohort definitions, hold types and priorities, student-attribute framework, and registration-window cohort separation. Requires DRC-3 resolution (graduate vs. undergraduate window separation) before cohort definitions can be finalized.",
+    definition_of_done:
+      "Blueprint signed by Registrar and Lead Consultant. DRC-3 resolved with cohort-separation decision recorded. SPAIDEN identification-rule table confirmed with NSU IT. Registration-window priority-group ordering tabled and cross-referenced to SSASECT configuration.",
+    raci: {
+      "Lead Consultant": "R",
+      "Functional Lead": "A",
+      "PM": "C",
+      "Sponsor": "I",
+    },
+    prerequisites: ["wp-nsu-charter"],
+    linked_oc_ids: ["spaiden", "sfarctl"],
+    linked_drc_ids: ["DRC-3"],
+    capability_refs: [{ domain: "Student", capabilities: ["bc-records"] }],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  {
+    id: "wp-nsu-bb-payroll",
+    title: "Business Blueprint · Payroll",
+    phase: "design",
+    stage: "design-blueprint",
+    order: 5,
+    engagement_id: "nsu",
+    capability_id: "bc-payroll",
+    state: "in-progress",
+    owner: "dl",
+    due: "May 18, 2026",
+    purpose_and_scope:
+      "Documents confirmed payroll configuration decisions: earn-code taxonomy, deduction routing, tax-jurisdiction setup, and payroll-calc dry-run parameters. Graduate-assistant earn-code variants (DRC-7) are the primary open item; all other earn-code categories confirmed.",
+    definition_of_done:
+      "Blueprint signed by Payroll Director and Functional Lead. DRC-7 earn-code mapping table signed. Deduction priority order tabled and confirmed by Benefits team. PTREARN configuration mirrored to OC guide OC-5.2.1.",
+    raci: {
+      "Functional Lead": "R",
+      "Lead Consultant": "A",
+      "PM": "C",
+      "Sponsor": "I",
+    },
+    prerequisites: ["wp-nsu-bb-hr-core"],
+    feeds_into: ["wp-nsu-cutover-hr"],
+    linked_oc_ids: ["ptrearn"],
+    linked_drc_ids: ["DRC-7"],
+    capability_refs: [{ domain: "HR", capabilities: ["bc-payroll"] }],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  {
+    id: "wp-nsu-bb-gl",
+    title: "Business Blueprint · General Ledger",
+    phase: "design",
+    stage: "design-blueprint",
+    order: 6,
+    engagement_id: "nsu",
+    capability_id: "bc-gl",
+    state: "not-started",
+    owner: "rk",
+    due: "Jul 10, 2026",
+    purpose_and_scope:
+      "Will document NSU's chart-of-accounts structure, fund and program segment definitions, period-close calendar, and FGRGL configuration decisions. Scoped to Finance go-live (Aug 18). Not yet in active sprint; authoring begins once HR/Payroll cutover clears the team's capacity.",
+    definition_of_done:
+      "Blueprint signed by Controller and Functional Lead. Fund-balance methodology confirmed (unrestricted vs. restricted). Chart of accounts coded and validated against FGRGL test entries. Period-close calendar ratified.",
+    raci: {
+      "Functional Lead": "R",
+      "Lead Consultant": "A",
+      "PM": "C",
+      "Sponsor": "I",
+    },
+    prerequisites: ["wp-nsu-charter"],
+    linked_oc_ids: ["fgrgl"],
+    capability_refs: [{ domain: "Finance", capabilities: ["bc-gl"] }],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  // ── NSU · Validate phase — Test Plans ─────────────────────────────────────
+
+  {
+    id: "wp-nsu-test-plan-curriculum",
+    title: "Test Plan · Curriculum Management",
+    phase: "validate",
+    stage: "validate-uat",
+    order: 1,
+    engagement_id: "nsu",
+    capability_id: "bc-curriculum",
+    state: "in-progress",
+    owner: "jh",
+    due: "May 21, 2026",
+    purpose_and_scope:
+      "Defines acceptance criteria, test scripts, and execution schedule for Curriculum Management UAT. Anchored to the SOATERM Inner Source Gherkin pack (62 base cases) plus 18 NSU-specific cases covering the 4-PoT block layout and Fall 2026 term. Validation gate for Student Phase 1 go-live.",
+    definition_of_done:
+      "All 80 test cases executed with pass/fail/defer recorded in Jira. Zero P1/P2 defects open at UAT sign-off. Registrar and Functional Lead co-sign UAT completion memo. Deferred items logged in RAID.",
+    raci: {
+      "Lead Consultant": "A",
+      "Functional Lead": "R",
+      "PM": "C",
+      "Sponsor": "I",
+    },
+    prerequisites: ["wp-nsu-bb-curriculum"],
+    linked_oc_ids: ["soaterm", "sfarctl", "ssasect"],
+    capability_refs: [{ domain: "Student", capabilities: ["bc-curriculum"] }],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  {
+    id: "wp-nsu-test-plan-hr-core",
+    title: "Test Plan · HR Core & Position",
+    phase: "validate",
+    stage: "validate-uat",
+    order: 2,
+    engagement_id: "nsu",
+    capability_id: "bc-hr-core",
+    state: "not-started",
+    owner: "dl",
+    due: "May 15, 2026",
+    purpose_and_scope:
+      "Will define test scripts for HR Core UAT: position-control validation, ECLS-assignment smoke tests, and benefit-deduction routing verification. Parallel to the payroll calc dry-run, which owns earn-code validation. Scheduled to start once the HR Core Business Blueprint sign-off is confirmed.",
+    definition_of_done:
+      "Position-control hierarchy validated end-to-end in Banner SaaS UAT tenant. ECLS assignments confirmed for all active employee classes. Zero P1 defects open at sign-off. HRBP co-signs UAT summary memo before cutover window.",
+    raci: {
+      "Functional Lead": "R",
+      "Lead Consultant": "A",
+      "PM": "C",
+      "Sponsor": "I",
+    },
+    prerequisites: ["wp-nsu-bb-hr-core"],
+    feeds_into: ["wp-nsu-cutover-hr"],
+    linked_oc_ids: ["nbaposn"],
+    capability_refs: [{ domain: "HR", capabilities: ["bc-hr-core"] }],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  // ── NSU · Deploy phase — Cutover Runbook ──────────────────────────────────
+
+  {
+    id: "wp-nsu-cutover-hr",
+    title: "Cutover Runbook · HR/Payroll",
+    phase: "deploy",
+    stage: "deploy-cutover",
+    order: 1,
+    engagement_id: "nsu",
+    state: "in-progress",
+    owner: "dl",
+    due: "May 22, 2026",
+    purpose_and_scope:
+      "Step-by-step operational runbook for the May 22–24 HR/Payroll go-live weekend. Covers 38 sequenced steps across freeze, data-migration validation, Banner SaaS activation, parallel-run payroll calc, and go/no-go decision checkpoint. Estimated execution window: 14 hours.",
+    definition_of_done:
+      "Runbook reviewed by Lead Consultant and Tech Lead. Dry-run tabletop completed with HR and Payroll directors. Go/no-go criteria and rollback thresholds defined. Final version signed by Project Sponsor by May 22 COB.",
+    raci: {
+      "Functional Lead": "R",
+      "Lead Consultant": "A",
+      "Tech Lead": "C",
+      "PM": "C",
+      "Sponsor": "I",
+    },
+    prerequisites: ["wp-nsu-bb-hr-core", "wp-nsu-bb-payroll"],
+    feeds_into: ["wp-nsu-hypercare-hr"],
+    capability_refs: [
+      { domain: "HR", capabilities: ["bc-hr-core", "bc-payroll"] },
+    ],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  // ── NSU · Stabilize phase — Hypercare Playbook ────────────────────────────
+
+  {
+    id: "wp-nsu-hypercare-hr",
+    title: "Hypercare Playbook · HR/Payroll",
+    phase: "stabilize",
+    stage: "stabilize-hypercare",
+    order: 1,
+    engagement_id: "nsu",
+    state: "not-started",
+    owner: "cs",
+    due: "Jun 30, 2026",
+    purpose_and_scope:
+      "Defines the 30/60/90-day post-go-live support model for HR/Payroll. Frames severity-tiered response SLAs, on-call rotation schedule, client knowledge-transfer checkpoints, and escalation path to Ellucian Support for post-stabilization. Stub exists from charter; authoring begins after cutover runbook sign-off.",
+    definition_of_done:
+      "Playbook reviewed and accepted by NSU Project Sponsor and Ellucian Delivery Manager. Severity tiers and response SLAs confirmed with client IT. Knowledge-transfer checklist completed. 30-day post-GL status review meeting scheduled.",
+    raci: {
+      "PM": "R",
+      "Lead Consultant": "A",
+      "Sponsor": "C",
+      "Functional Lead": "I",
+    },
+    prerequisites: ["wp-nsu-cutover-hr"],
+    capability_refs: [
+      { domain: "HR", capabilities: ["bc-hr-core", "bc-payroll"] },
+    ],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  // ── WIU · Western Illinois University ────────────────────────────────────
+
+  {
+    id: "wp-wiu-charter",
+    title: "Engagement Charter",
+    phase: "discover",
+    stage: "discover-charter",
+    order: 1,
+    engagement_id: "wiu",
+    state: "signed",
+    owner: "jh",
+    purpose_and_scope:
+      "Defines engagement scope and governance for Western Illinois University's Banner SaaS Select implementation. Financial Aid Administration is the primary capability wave; the engagement framing positions R2T4 processing and ISIR ingest as Sprint 1 anchors.",
+    definition_of_done:
+      "Charter signed by WIU Executive Sponsor and Ellucian Engagement Manager. Stored in WIU SharePoint engagement library. Capability wave sequence and FA proc-year conventions ratified.",
+    raci: {
+      "Lead Consultant": "A",
+      "PM": "R",
+      "Functional Lead": "C",
+      "Sponsor": "I",
+    },
+    capability_refs: [{ domain: "Student" }],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  {
+    id: "wp-wiu-bb-faa",
+    title: "Business Blueprint · Financial Aid Admin",
+    phase: "design",
+    stage: "design-blueprint",
+    order: 1,
+    engagement_id: "wiu",
+    capability_id: "bc-faa",
+    state: "in-progress",
+    owner: "jh",
+    due: "Jun 10, 2026",
+    purpose_and_scope:
+      "Documents WIU's Financial Aid configuration decisions: award-packaging rules, ISIR ingest and EFC processing, R2T4 return methodology, and RORPRIO award-priority setup. FA proc-year offset confirmation (DRC-4) is the primary open item before the blueprint can be finalized.",
+    definition_of_done:
+      "Blueprint signed by WIU FA Director and Lead Consultant. DRC-4 proc-year offset confirmed and recorded. RORPRIO priority table built from the Inner Source R2T4 retro (WIU-44). Award-packaging rules validated against 2026–27 aid-year scenarios.",
+    raci: {
+      "Lead Consultant": "R",
+      "Functional Lead": "A",
+      "PM": "C",
+      "Sponsor": "I",
+    },
+    prerequisites: ["wp-wiu-charter"],
+    feeds_into: ["wp-wiu-test-plan-faa"],
+    linked_oc_ids: ["rorprio"],
+    linked_drc_ids: ["DRC-4"],
+    capability_refs: [{ domain: "Student", capabilities: ["bc-faa"] }],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  {
+    id: "wp-wiu-test-plan-faa",
+    title: "Test Plan · Financial Aid Admin",
+    phase: "validate",
+    stage: "validate-uat",
+    order: 1,
+    engagement_id: "wiu",
+    capability_id: "bc-faa",
+    state: "not-started",
+    owner: "jh",
+    due: "Jul 15, 2026",
+    purpose_and_scope:
+      "Will define acceptance criteria and UAT scripts for Financial Aid Admin: ISIR ingest, award packaging, R2T4 return calculation, and COD disbursement reconciliation. Not in active sprint; authoring begins after Business Blueprint sign-off.",
+    definition_of_done:
+      "All FAA UAT test cases executed with pass/fail/defer recorded. R2T4 scenarios verified against ED return-of-funds requirements. FA Director co-signs UAT completion memo before go-live.",
+    raci: {
+      "Lead Consultant": "R",
+      "Functional Lead": "A",
+      "PM": "C",
+      "Sponsor": "I",
+    },
+    prerequisites: ["wp-wiu-bb-faa"],
+    capability_refs: [{ domain: "Student", capabilities: ["bc-faa"] }],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  // ── CSU East Bay ──────────────────────────────────────────────────────────
+
+  {
+    id: "wp-csu-charter",
+    title: "Engagement Charter",
+    phase: "discover",
+    stage: "discover-charter",
+    order: 1,
+    engagement_id: "csu-eb",
+    state: "signed",
+    owner: "jh",
+    purpose_and_scope:
+      "Defines engagement scope for CSU East Bay's Banner SaaS Essentials implementation. General Ledger is the primary active capability; period-close and chart-of-accounts are the initial configuration focus. Charter ratified at Sprint 0 kickoff ahead of Jun 15 go-live.",
+    definition_of_done:
+      "Charter signed by CSU EB Provost Office representative and Ellucian Engagement Manager. Capability scope and Jun 15 go-live date ratified. Stored in CSU EB SharePoint engagement library.",
+    raci: {
+      "Lead Consultant": "A",
+      "PM": "R",
+      "Functional Lead": "C",
+      "Sponsor": "I",
+    },
+    capability_refs: [{ domain: "Finance" }],
+    applies_to: { products: ["Banner SaaS"] },
+  },
+
+  {
+    id: "wp-csu-test-plan-gl",
+    title: "Test Plan · General Ledger",
+    phase: "validate",
+    stage: "validate-uat",
+    order: 1,
+    engagement_id: "csu-eb",
+    capability_id: "bc-gl",
+    state: "needs-review",
+    owner: "rk",
+    due: "May 28, 2026",
+    purpose_and_scope:
+      "Defines acceptance criteria and UAT scripts for CSU East Bay's General Ledger configuration: chart-of-accounts structure, fund-balance methodology, period-close sequence, and FGRGL validation. End-of-month period-close test (CSU-12) completed; results feed this test plan's formal UAT pass/fail record.",
+    definition_of_done:
+      "All GL UAT test cases executed and recorded. Period-close test results from CSU-12 incorporated and signed off. Controller co-signs UAT completion memo. Zero P1 defects open before Jun 15 go-live window.",
+    raci: {
+      "Functional Lead": "R",
+      "Lead Consultant": "A",
+      "PM": "C",
+      "Sponsor": "I",
+    },
+    linked_oc_ids: ["fgrgl"],
+    capability_refs: [{ domain: "Finance", capabilities: ["bc-gl"] }],
+    applies_to: { products: ["Banner SaaS"] },
+  },
 ];
 
 export const SMART_QUEUE = [

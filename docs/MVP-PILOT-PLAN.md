@@ -301,8 +301,9 @@ Surgical, no Stance B infrastructure yet. Closes the obsolete plan's surviving i
 | B0-5 | ux-visionary | S | Cull duplicate CSS (carry-over from Stance A B16) | DRIFT-AUDIT-2026-05-15.md C1–C3 |
 | B0-6 | release-manager | M | GitHub Actions: `pnpm next build` + `pnpm smoke` on push/PR; branch protection on `main` | now MUST-have under Stance B (DB migrations need a CI gate) |
 | B0-7 | test-engineer | M | Bootstrap Playwright + 1 smoke spec hitting all 11 routes asserting no JS crash (carry-over) | now MUST-have under Stance B |
+| B0-8 | lead-developer | M | **Work Products surface (Path B).** (a) `WORK_PRODUCTS` seed populated by methodology-guru (~15-18 entries for NSU + WIU + CSU EB across capabilities). (b) New leftmost "Work Products" tab on `CapabilityDetailPage` grouping the engagement's WPs for this capability by phase, with state badge / owner / due / linked-OC count. (c) New `#workproducts` portfolio kanban — 5 lanes (`Not Started / In Progress / Needs Review / Signed / Blocked`), filter by phase + engagement + owner, shape mirrors active-playbook's `KanbanBoard.tsx`. (d) New `#workproducts/<id>` detail route showing purpose_and_scope, definition_of_done, RACI grid, prerequisites/feeds_into as upstream/downstream links, linked OCs (deep-link to guides), linked DRCs (deep-link to decisions). | Path B fork resolved 2026-05-12; data shape landed 2026-05-12 (freeze-safe, type-only); views deferred to post-audit per UI freeze |
 
-**Acceptance:** v1 archive deleted, dead exports gone, both themes work, focus rings everywhere, CI gates `main`, Playwright runs in CI. `pnpm smoke` green at every commit.
+**Acceptance:** v1 archive deleted, dead exports gone, both themes work, focus rings everywhere, CI gates `main`, Playwright runs in CI. Work Products surface mounted at `#workproducts`, capability detail surfaces deliverables not just tasks. `pnpm smoke` green at every commit.
 
 ### Sprint B1 — data layer foundation · 2026-05-25 → 2026-06-05 (2 wk · US Memorial Day Mon May 25 reduces to 9 working days)
 

@@ -4,7 +4,22 @@ All notable changes to the n2s-consulting-toolkit prototype are recorded here.
 Format roughly follows [Keep a Changelog](https://keepachangelog.com).
 Versions are semver-ish for a prototype (`0.x` is pre-pilot; `1.0` will be the first stable pilot cut).
 
-## [Unreleased] — 2026-05-11 (evening)
+## [Unreleased] — 2026-05-12 (morning)
+
+Work Products entity landed (data shape only — freeze-safe). User answered the architecture fork: **Path B — toolkit stays independent**. Sibling-project tour (`n2s-active-playbook`, `n2s-heear-editor`) confirmed both already model work products as first-class typed entities with kanban + stage-progress UI. Toolkit copies active-playbook's `WorkProductSchema` field names verbatim so a future bridge to canonical data is a swap, not a refactor. Three views (per-capability tab, portfolio kanban, per-WP detail) added to Sprint B0 as B0-8; deferred past audit per UI freeze.
+
+### Added
+- `lib/data.ts` — new `WorkProduct` type + `WorkProductPhase`, `WorkProductState`, `RaciRole`, `CapabilityRef` types, plus `WORK_PRODUCT_STATES` / `WORK_PRODUCT_STATE_LABELS` helpers. Methodology-side fields (`id`, `title`, `phase`, `stage`, `order`, `raci`, `purpose_and_scope`, `definition_of_done`, `exemptions`, `owner`, `prerequisites`, `feeds_into`, `capability_refs`, `applies_to`) match active-playbook's `WorkProductSchema` verbatim. Runtime fields (`engagement_id`, `capability_id`, `state`, `due`, `linked_oc_ids`, `linked_drc_ids`) are toolkit-specific (active-playbook puts these on `Task`, but this prototype's frame is engagement-centric so they materialize on the WP). State machine: `not-started → in-progress → needs-review → signed`, with `blocked` as an off-ladder state.
+- `lib/data.ts` `WORK_PRODUCTS` — methodology-guru seeded 17 entries across NSU (12), WIU (3), CSU EB (2). State distribution: 5 `signed` / 5 `in-progress` / 2 `needs-review` / 4 `not-started` / 1 `blocked`. All references resolve to existing OC_INDEX / DRCS / BUSINESS_CAPABILITIES / ENGAGEMENT.members ids — no invented ids. Decision log at `.claude/agent-memory/methodology-guru/project_workproducts_seed_decisions.md`.
+- `docs/MVP-PILOT-PLAN.md` Sprint B0 — new item **B0-8** (lead-developer, M) for the Work Products UI surface: seed authoring by methodology-guru, per-capability tab on `CapabilityDetailPage`, `#workproducts` portfolio kanban (5 lanes, mirrors active-playbook's `KanbanBoard.tsx`), `#workproducts/<id>` detail route. Acceptance bar updated to require WP surface mounted.
+- `.claude/agent-memory/chief-architect/project_workproducts_path_b_decision_2026_05_12.md` — full decision log: the architecture fork, why Path B won (8/3 pilot holds, no re-keying SFARCTL/SPAIDEN, no integration dependencies on two sibling projects), the trade-off accepted (data divergence from canonical hierarchy is now permanent unless bridged later).
+
+### Changed
+- `lib/data.ts` `PORTFOLIO` — flipped engagement ids from sequential codes (`p1` ... `p8`) to slugs (`nsu`, `wiu`, `csu-eb`, `usc`, `uvm`, `lafayette`, `oakland`, `coastline-cc`). Closes the long-standing id-space incoherence between `ENGAGEMENT.id` (already a slug), `PORTFOLIO[].id` (was a code), and `WORK_PRODUCTS[].engagement_id` (now a slug). Data-only; rendered surface unchanged (logos/names/sprints/etc. all identical). `shell.tsx` reads `v2.currentProject` from localStorage with an existing guard that falls back to `portfolio[0].id` when no match, so stored `p1...p8` values gracefully recover to NSU on next page load. Repo-wide grep verified no other hardcoded references to `p1...p8`.
+- `lib/data.ts` `WORK_PRODUCTS` — restored methodology-guru's original slug-based `engagement_id` values (`nsu / wiu / csu-eb`) — they were temporarily re-keyed to `p1/p2/p3` to match the old PORTFOLIO convention, but now everything lines up.
+- `BACKLOG.md` — note appended to "Recently shipped" capturing the Path B fork resolution and the WP entity landing.
+
+
 
 Hosting deferral + dev-experience push. User clarified Vercel deploys are deferred until pilot is funded ("that's not free"). Focus shifts to dev experience: devs being able to work on this locally + CI catching breakage on push/PR.
 
