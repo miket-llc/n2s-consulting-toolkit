@@ -12,3 +12,4 @@ This is the agent's persistent memory across sessions. Add memory entries as sep
 | File | Type | Summary |
 |---|---|---|
 | `project_mvp_pilot_review.md` | project | Full code-level pilot readiness audit — 2026-05-11. Findings, cull list, 10 sequenced work items, risks. |
+| `project_b08_workproducts_views.md` | project | B0-8 (2026-05-12): Work Products UI — files changed, CSS classes, judgment calls, known debt, toolkit-originals 9–11. |

@@ -15,10 +15,10 @@ import { Icon } from "./icons";
 import { useApp, useHash, PageHero, Section, notImplemented } from "./shell";
 import {
   BUSINESS_CAPABILITIES, TASKS, DRCS, GO_LIVES, WORKSHOPS,
-  INNER_SOURCE, OC_INDEX, OC_DATA,
-  CONFIG_FIELDS_BY_OC,
+  INNER_SOURCE, OC_INDEX, OC_DATA, CONFIG_FIELDS_BY_OC,
+  WORK_PRODUCTS, WORK_PRODUCT_STATE_LABELS, METHODOLOGY_PHASES, ENGAGEMENT,
 } from "@/lib/data";
-import type { ConfigField } from "@/lib/data";
+import type { ConfigField, WorkProductPhase } from "@/lib/data";
 
 // ── Local types ──────────────────────────────────────────────────────────────
 
@@ -640,6 +640,7 @@ const RailCard = ({ eyebrow, title, action, children, accent }: {
 // ════════════════════════════════════════════════════════════════════════════
 export function CapabilityDetailPage({ capId }: { capId: string }) {
   const [, navigate] = useHash();
+  const { currentProject } = useApp();
   const cap = BUSINESS_CAPABILITIES.find(c => c.id === capId);
 
   // All hooks must run before any conditional return.
@@ -655,7 +656,7 @@ export function CapabilityDetailPage({ capId }: { capId: string }) {
 
   const tabKey = `v2.capability.${capId}.tab`;
   const [tab, setTabState] = useState<string>(() => {
-    try { return localStorage.getItem(tabKey) || "delivery"; } catch { return "delivery"; }
+    try { return localStorage.getItem(tabKey) || "workproducts"; } catch { return "workproducts"; }
   });
 
   // Redirect on bad id.
@@ -669,6 +670,11 @@ export function CapabilityDetailPage({ capId }: { capId: string }) {
   if (!cap) return null;
 
   // Derived (no more hooks past this point).
+  const currentEngagementId = currentProject?.id || "nsu";
+  const wpCount = WORK_PRODUCTS.filter(
+    w => w.capability_id === capId && w.engagement_id === currentEngagementId
+  ).length;
+
   const setTab = (id: string) => {
     setTabState(id);
     try { localStorage.setItem(tabKey, id); } catch { /* noop */ }
@@ -763,9 +769,10 @@ export function CapabilityDetailPage({ capId }: { capId: string }) {
       {/* Tabs */}
       <SegTabs
         tabs={[
-          { id: "delivery",  label: "Delivery" },
-          { id: "decisions", label: "Decisions", count: openDrcs.length },
-          { id: "budget",    label: "Budget" },
+          { id: "workproducts", label: "Work Products", count: wpCount },
+          { id: "delivery",     label: "Delivery" },
+          { id: "decisions",    label: "Decisions", count: openDrcs.length },
+          { id: "budget",       label: "Budget" },
         ]}
         value={tab}
         onChange={setTab}
@@ -774,6 +781,13 @@ export function CapabilityDetailPage({ capId }: { capId: string }) {
       {/* Two-column layout: main + rail */}
       <div className="d-twocol">
         <div className="d-main">
+          {tab === "workproducts" && (
+            <WorkProductsTab
+              capId={capId}
+              engagementId={currentEngagementId}
+              navigate={navigate}
+            />
+          )}
           {tab === "delivery" && (
             <DeliveryTab
               cap={cap} ocs={allOcs}
@@ -1095,6 +1109,105 @@ function BudgetTab({ capId, detail }: { capId: string; detail: DetailData }) {
         </div>
       </div>
     </>
+  );
+}
+
+// ── Work Products tab (leftmost default tab on CapabilityDetailPage) ──────
+// Shows WPs scoped to this cap + current engagement, grouped by phase.
+// Engagement-wide WPs (capability_id undefined) are excluded — they appear
+// only on the portfolio kanban (#workproducts).
+
+const WP_PHASE_ORDER: WorkProductPhase[] = [
+  "discover", "design", "build", "validate", "deploy", "stabilize",
+];
+
+const WP_PHASE_TONE: Record<WorkProductPhase, string> = {
+  discover:  "cyan",  design:    "violet",
+  build:     "accent", validate:  "amber",
+  deploy:    "emerald", stabilize: "emerald",
+};
+
+const WP_STATE_TONE: Record<string, string> = {
+  "not-started":  "neutral",
+  "in-progress":  "accent",
+  "needs-review": "amber",
+  "signed":       "emerald",
+  "blocked":      "rose",
+};
+
+function WorkProductsTab({ capId, engagementId, navigate }: {
+  capId: string;
+  engagementId: string;
+  navigate: (hash: string) => void;
+}) {
+  const wps = WORK_PRODUCTS.filter(
+    wp => wp.capability_id === capId && wp.engagement_id === engagementId
+  );
+
+  if (wps.length === 0) {
+    return (
+      <div className="d-empty">No work products tracked for this capability in this engagement.</div>
+    );
+  }
+
+  const grouped = WP_PHASE_ORDER
+    .map(phase => ({
+      phase,
+      label: METHODOLOGY_PHASES.find(m => m.id === phase)?.label || phase,
+      items: wps.filter(w => w.phase === phase),
+    }))
+    .filter(g => g.items.length > 0);
+
+  return (
+    <div className="v2-list" style={{ marginBottom: 0 }}>
+      {grouped.map(g => (
+        <React.Fragment key={g.phase}>
+          <div className={`v2-wp-tabphase`}>
+            <span className={`pill pill-${WP_PHASE_TONE[g.phase]}`} style={{ marginRight: 4 }}>
+              {g.label}
+            </span>
+          </div>
+          {g.items.map(wp => {
+            const stateTone = WP_STATE_TONE[wp.state] || "neutral";
+            const stateLabel = WORK_PRODUCT_STATE_LABELS[wp.state];
+            const owner = ENGAGEMENT.members.find(m => m.id === wp.owner);
+            const ocCount = wp.linked_oc_ids?.length ?? 0;
+            return (
+              <button
+                key={wp.id}
+                className="v2-wp-tabrow"
+                onClick={() => navigate(`workproducts/${wp.id}`)}
+                aria-label={`${wp.title} · ${stateLabel}`}
+              >
+                <div className="v2-wp-tabtitle">{wp.title}</div>
+                <span className={`pill pill-${stateTone}`}>{stateLabel}</span>
+                {owner ? (
+                  <span
+                    title={`${owner.name} · ${owner.role}`}
+                    style={{
+                      display: "inline-grid", placeItems: "center",
+                      width: 20, height: 20, borderRadius: "50%",
+                      background: owner.color + "22", color: owner.color,
+                      fontSize: 9, fontWeight: 700, flexShrink: 0,
+                    }}
+                  >
+                    {owner.initials}
+                  </span>
+                ) : <span/>}
+                <span className="v2-wp-tablinks">
+                  {wp.due && <span className="t-mono">{wp.due}</span>}
+                </span>
+                <span className="v2-wp-tablinks">
+                  {ocCount > 0 && (
+                    <span className="t-mono">{ocCount} OC{ocCount !== 1 ? "s" : ""}</span>
+                  )}
+                </span>
+              </button>
+            );
+          })}
+        </React.Fragment>
+      ))}
+    </div>
   );
 }
 

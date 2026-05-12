@@ -7,6 +7,7 @@
 
 @import url("./tokens.css");
 @import url("./detail.css");
+@import url("./workproducts.css");
 
 *, *::before, *::after { box-sizing: border-box; }
 

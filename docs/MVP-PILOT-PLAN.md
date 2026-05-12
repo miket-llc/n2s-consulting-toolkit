@@ -294,16 +294,16 @@ Surgical, no Stance B infrastructure yet. Closes the obsolete plan's surviving i
 
 | # | Owner | Size | Item | Source |
 |---|---|---|---|---|
-| B0-1 | lead-developer | S | Cull v1 archive — single commit, ~3,841 lines (`components/views/*`, root-level `components/{shell,icons,tweaks-panel}.tsx`, `app/styles/styles.css`) | survives from Stance A B1 |
+| ~~B0-1~~ | ~~lead-developer~~ | ~~S~~ | ~~Cull v1 archive — single commit, ~3,841 lines~~ | **DONE 2026-05-12 PM** — pulled forward in freeze-override slice. 3,842 lines deleted; build + smoke green. |
 | B0-2 | lead-developer | S | Cull dead `lib/data.ts` exports (`Member`, `ENGAGEMENT`, `SPRINTS`, `ACTIVE_SPRINT`, `SPRINT_PLAN_BACKLOG`, `DOC_TREE`, `DOCUMENTS`, `SMART_QUEUE`, `FINDING_INDEX`) | survives from Stance A B2 |
-| B0-3 | lead-developer | M | Drift fixes from May 15 audit: D1 (`--surface-1/--surface-2` tokens), D2 (`.theme-light .d-code` override), D3 (Project Home capability/guide/workshop deep-links), D4 (DRC row → OC navigation) | DRIFT-AUDIT-2026-05-15.md §4 |
+| B0-3 | lead-developer | M | Drift fixes from May 15 audit: D1 (`--surface-1/--surface-2` tokens), D2 (`.theme-light .d-code` override), D3 (Project Home capability/guide/workshop deep-links), D4 (DRC row → OC navigation). ~~D5 (topbar gradient)~~ DONE 2026-05-12 in freeze-override slice. | DRIFT-AUDIT-2026-05-15.md §4 |
 | B0-4 | ux-visionary | S | Focus-visible pass (carry-over from Stance A B13) | ux-visionary §3 |
 | B0-5 | ux-visionary | S | Cull duplicate CSS (carry-over from Stance A B16) | DRIFT-AUDIT-2026-05-15.md C1–C3 |
 | B0-6 | release-manager | M | GitHub Actions: `pnpm next build` + `pnpm smoke` on push/PR; branch protection on `main` | now MUST-have under Stance B (DB migrations need a CI gate) |
 | B0-7 | test-engineer | M | Bootstrap Playwright + 1 smoke spec hitting all 11 routes asserting no JS crash (carry-over) | now MUST-have under Stance B |
-| B0-8 | lead-developer | M | **Work Products surface (Path B).** (a) `WORK_PRODUCTS` seed populated by methodology-guru (~15-18 entries for NSU + WIU + CSU EB across capabilities). (b) New leftmost "Work Products" tab on `CapabilityDetailPage` grouping the engagement's WPs for this capability by phase, with state badge / owner / due / linked-OC count. (c) New `#workproducts` portfolio kanban — 5 lanes (`Not Started / In Progress / Needs Review / Signed / Blocked`), filter by phase + engagement + owner, shape mirrors active-playbook's `KanbanBoard.tsx`. (d) New `#workproducts/<id>` detail route showing purpose_and_scope, definition_of_done, RACI grid, prerequisites/feeds_into as upstream/downstream links, linked OCs (deep-link to guides), linked DRCs (deep-link to decisions). | Path B fork resolved 2026-05-12; data shape landed 2026-05-12 (freeze-safe, type-only); views deferred to post-audit per UI freeze |
+| ~~B0-8~~ | ~~lead-developer~~ | ~~M~~ | ~~Work Products surface (Path B): seed + capability tab + portfolio kanban + WP detail route~~ | **DONE 2026-05-12 PM** — pulled forward in freeze-override slice. Three new toolkit-originals (#9-11). State-mutation deferred to Stance B Sprint B1 (`notImplemented` toast). |
 
-**Acceptance:** v1 archive deleted, dead exports gone, both themes work, focus rings everywhere, CI gates `main`, Playwright runs in CI. Work Products surface mounted at `#workproducts`, capability detail surfaces deliverables not just tasks. `pnpm smoke` green at every commit.
+**Acceptance:** dead exports gone, both themes work, focus rings everywhere, CI gates `main`, Playwright runs in CI. (v1 archive deletion + Work Products surface already shipped via 2026-05-12 PM freeze-override slice.) `pnpm smoke` green at every commit.
 
 ### Sprint B1 — data layer foundation · 2026-05-25 → 2026-06-05 (2 wk · US Memorial Day Mon May 25 reduces to 9 working days)
 

@@ -4,6 +4,34 @@ All notable changes to the n2s-consulting-toolkit prototype are recorded here.
 Format roughly follows [Keep a Changelog](https://keepachangelog.com).
 Versions are semver-ish for a prototype (`0.x` is pre-pilot; `1.0` will be the first stable pilot cut).
 
+## [Unreleased] — 2026-05-12 (afternoon — freeze-override slice)
+
+User dispositioned four pending guardian-flagged calls on 2026-05-12 AM and took the aggressive option on all four. This slice executes them: D5 escalated and fixed; v1-archive pulled forward and culled; B0-8 Work Products UI surface pulled forward from post-audit and shipped; ProjectIdentityChip uniqueness lock-in retired. K3NKe3Iu baseline is **not** re-anchored; audit catalogs the new surfaces as toolkit-originals #9–11.
+
+### Added
+- `components/v2/workproducts.tsx` (~330 lines) — `WorkProductsKanbanPage` (`#workproducts`, 5-lane state kanban: `Not Started / In Progress / Needs Review / Signed / Blocked`, filter row for phase + engagement + owner persisted to `localStorage["v2.workproducts.filters"]`) + `WorkProductDetailPage` (`#workproducts/<id>`, 10 sections: phase + state header, purpose & scope, DoD, RACI grid, prerequisites/feeds_into, linked OCs, linked DRCs, capability scope, applies_to chips, state-change controls firing `notImplemented` toast).
+- `app/styles/workproducts.css` (~240 lines) — hand-authored CSS for the two new pages. No new tokens introduced; reuses existing `--surface-*`, `--text-*`, `--border` vars and `.pill-{cyan,violet,accent,amber,emerald}` phase-chip classes.
+- `components/v2/detail.tsx` — new `WorkProductsTab` function (+95 lines) wired as the new **leftmost** tab on `CapabilityDetailPage` (default when no `?tab=` set; `delivery` is now the second tab). Groups WPs for this cap + engagement by phase with state badges, owner avatars, due dates, linked-OC/DRC counts.
+- `app/page.tsx` — two new route handlers: `workproducts` index → `WorkProductsKanbanPage`, `workproducts/<id>` → `WorkProductDetailPage`. Follows existing hash-router pattern (matches `guides/<ocId>` and `capabilities/<capId>` shape).
+- `components/v2/icons.tsx` — new `workproducts` icon (clipboard + check).
+- `components/v2/shell.tsx` — `RAIL_TOP` gained a `workproducts` entry (mywork-adjacent, practice-wide route, not project-scoped).
+- `.claude/agent-memory/lead-developer/project_b08_workproducts_views.md` — full implementation provenance (files, line counts, judgment calls, known debt).
+- `docs/audits/DRIFT-AUDIT-2026-05-15.md` — new "Freeze-override slice (2026-05-12)" addendum documenting the four-call sign-off and the resulting state changes; toolkit-originals 9-11 added to §3; D5 row in §4 struck-through + RESOLVED; §6 sign-off table updated (chief-architect + user now ✓); §6.1 verdict + §6.2 tag readiness updated for the new state.
+- `.claude/agent-memory/design-fidelity-guardian/project_toolkit_original_additions.md` — items 9-11 added (B0-8 surfaces); item 8 lock-in language retired; new §"9-11. B0-8 Work Products UI surface" narrative section.
+
+### Changed
+- `app/styles/tokens.css` — `--gradient-topbar` updated to `linear-gradient(90deg, #6b2bd9 0%, #7c3aed 38%, #8b5cf6 100%)` matching K3NKe3Iu tarball spec on all three flagged D5 axes (angle 135→90deg, light-mode end-stop `#9333ea`→`#8b5cf6`, start-stop hex `#6d28d9`→`#6b2bd9`, mid-stop position `40%`→`38%`). `--gradient-topbar-dark` angle synced to 90deg for theme coherence; dark colors unchanged (audit did not flag them). D5 RESOLVED.
+- `app/styles/v2.css` — `@import "workproducts.css"` added.
+- `.claude/agent-memory/design-fidelity-guardian/MEMORY.md` — index updated to "eleven catalogued toolkit-originals"; item 8 lock-in retirement noted.
+
+### Removed
+- **v1 archive pulled forward from Sprint B0-1 and deleted.** ~3,842 lines removed: `components/views/views-{1,2,3,meta,new,oc}.tsx` (6 files); `components/{shell,icons,tweaks-panel}.tsx` (root-level legacy, 3 files); `app/styles/styles.css` (legacy stylesheet, 1 file). `components/views/` directory auto-removed when empty. Zero mounted-file imports referenced any of the deleted paths (verified by repo-wide grep pre-deletion). Audit subject no longer includes the legacy v1 surface.
+
+### Verification
+- `pnpm next build` green at every step (after D5 fix; after v1-archive cull; after B0-8 land).
+- `pnpm smoke` green at every step.
+- Both `.theme-light` and `.theme-dark` render correctly on new and existing surfaces.
+
 ## [Unreleased] — 2026-05-12 (morning)
 
 Work Products entity landed (data shape only — freeze-safe). User answered the architecture fork: **Path B — toolkit stays independent**. Sibling-project tour (`n2s-active-playbook`, `n2s-heear-editor`) confirmed both already model work products as first-class typed entities with kanban + stage-progress UI. Toolkit copies active-playbook's `WorkProductSchema` field names verbatim so a future bridge to canonical data is a swap, not a refactor. Three views (per-capability tab, portfolio kanban, per-WP detail) added to Sprint B0 as B0-8; deferred past audit per UI freeze.

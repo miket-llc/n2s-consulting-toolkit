@@ -177,11 +177,16 @@ Eight surfaces / behaviours in this port have no tarball counterpart and are rec
 | 5 | ⌘K / Ctrl-K search-focus shortcut | `shell.tsx` | 2026-05-15 audit (CgM4C5b7 pass) |
 | 6 | Top-level render-error boundary (`app/error.tsx`, `not-found.tsx`, `loading.tsx`) | `app/` | 2026-05-15 audit (CgM4C5b7 pass) |
 | 7 | `v2-shell.has-projctx` layout modifier + paired `.has-projctx .v2-body` / `.v2-rail` CSS rules that correctly subtract `--projctx-height` from min-height/top/height | `shell.tsx`, `v2.css` | **2026-05-15 audit (K3NKe3Iu re-pass)** |
-| 8 | Passive `ProjectIdentityChip` (topbar pill on non-project-scoped routes; navigates to Project home; does NOT open switcher menu) | `shell.tsx`, `v2.css` `.v2-projidchip*` | **2026-05-15 audit (K3NKe3Iu re-pass) — explicit product-owner-required tweak beyond the literal design** |
+| 8 | Passive `ProjectIdentityChip` (topbar pill on non-project-scoped routes; navigates to Project home; does NOT open switcher menu) | `shell.tsx`, `v2.css` `.v2-projidchip*` | **2026-05-15 audit (K3NKe3Iu re-pass) — product-owner-required tweak beyond the literal design** |
+| 9 | **WorkProductsKanbanPage** — `#workproducts` portfolio route, 5-lane state kanban (`Not Started` / `In Progress` / `Needs Review` / `Signed` / `Blocked`), filter row (phase + engagement + owner) persisted to `localStorage["v2.workproducts.filters"]`. Tarball does not ship a work-products surface. | `workproducts.tsx`, `workproducts.css`, `app/page.tsx` route handler, `shell.tsx` RAIL_TOP entry | **2026-05-15 audit (freeze-override pull-forward 2026-05-12)** |
+| 10 | **WorkProductDetailPage** — `#workproducts/<id>` route with 10 sections (phase + state header, purpose & scope, DoD, RACI grid, prerequisites/feeds_into, linked OCs, linked DRCs, capability scope, applies_to chips, state-change controls firing `notImplemented` toast). Tarball does not ship this view. | `workproducts.tsx`, `workproducts.css`, `app/page.tsx` route handler | **2026-05-15 audit (freeze-override pull-forward 2026-05-12)** |
+| 11 | **WorkProductsTab on CapabilityDetailPage** — new leftmost tab (default when no `?tab=` set), groups WPs for this cap + engagement by phase with state badges, owner avatars, due dates, linked-OC/DRC counts. Tarball capability detail does not ship a Work Products tab; "Delivery" was the prior default and remains as second tab. | `detail.tsx` CapabilityDetailPage (tab table + new `WorkProductsTab` function) | **2026-05-15 audit (freeze-override pull-forward 2026-05-12)** |
 
-Items 7 and 8 land with the K3NKe3Iu re-anchor. Item 8 is the **only** toolkit-original beyond the literal design that the user explicitly authorized in the K3NKe3Iu scope-check (per `.claude/agent-memory/product-manager/project_design_K3NKe3Iu_scope_check.md` Option (a)). It exists because the K3NKe3Iu shell removes the project selector from non-project routes; product-owner critique was "Janet still needs to know which engagement is current when she's in MyWork / Methodology / Settings."
+Items 7 and 8 land with the K3NKe3Iu re-anchor. Items 9–11 land with the **freeze-override pull-forward 2026-05-12 PM** — user explicitly authorized pulling B0-8 (Work Products UI surface) from Sprint B0 (post-audit) into the pre-audit window. Same precedent as the K3NKe3Iu shell redesign override (2026-05-11 PM). The audit catalogs these as toolkit-originals rather than re-baselining a third time; chief-architect note in `.claude/agent-memory/chief-architect/project_workproducts_path_b_decision_2026_05_12.md`.
 
-`.claude/agent-memory/design-fidelity-guardian/project_toolkit_original_additions.md` is updated this audit pass to include items 4-8.
+The prior "**item 8 is the only allowed toolkit-tweak beyond the literal K3NKe3Iu design**" lock-in language is **retired 2026-05-12** — user confirmed "allow more beyond-design tweaks" in the sign-off call. Beyond-design additions are now classified as toolkit-originals (catalogued in the toolkit-originals memo) rather than treated as audit blockers. The chip remains in the catalog as item 8; items 9–11 join it.
+
+`.claude/agent-memory/design-fidelity-guardian/project_toolkit_original_additions.md` is updated this audit pass to include items 4–11.
 
 ---
 
@@ -202,7 +207,7 @@ Items 7 and 8 land with the K3NKe3Iu re-anchor. Item 8 is the **only** toolkit-o
 
 | ID | Where | Drift | Notes | Fix in |
 |---|---|---|---|---|
-| **D5** | `tokens.css` line 74 (`--gradient-topbar`) | **NEW from K3NKe3Iu pass.** Port gradient differs from tarball on three axes: (a) **angle** 135deg (diagonal) vs 90deg (horizontal) — most visible drift, changes the read of the new violet brand strip; (b) light-mode end-stop color `#9333ea` vs tarball `#8b5cf6` — port reads more saturated/warmer; (c) start-stop hex `#6d28d9` vs `#6b2bd9` and middle-stop position `40%` vs `38%` — trivial, mention for completeness. | Audit-tolerable because the strip still reads violet and the wordmark is legible inverted-white in both. Pilot-tolerable. Worth fixing for parity. | Sprint B0-3 |
+| ~~**D5**~~ | ~~`tokens.css` line 74 (`--gradient-topbar`)~~ | ~~**NEW from K3NKe3Iu pass.** Port gradient differs from tarball on three axes: (a) **angle** 135deg (diagonal) vs 90deg (horizontal); (b) light-mode end-stop color `#9333ea` vs tarball `#8b5cf6`; (c) start-stop hex `#6d28d9` vs `#6b2bd9` and middle-stop position `40%` vs `38%`.~~ | **RESOLVED 2026-05-12** — user escalated to HIGH in the sign-off call and authorized pre-audit fix. `tokens.css` now ships `linear-gradient(90deg, #6b2bd9 0%, #7c3aed 38%, #8b5cf6 100%)` per tarball spec; dark variant angle synced to 90deg for theme coherence (dark colors unchanged — audit did not flag those). Build + smoke green at fix SHA. See addendum "Freeze-override slice (2026-05-12)". | ✓ DONE |
 
 ### Cosmetic drift (LOW) — defer or fix in Sprint B0-3
 
@@ -233,6 +238,44 @@ The parity pass above ran at HEAD `8902109`. Commit `2cc9a46` landed 2026-05-11 
 Verification: `pnpm build` + `pnpm smoke` both green at `2cc9a46` (run by methodology-guru).
 
 This addendum exists so the audit reviewer sees the post-pass content land without thinking the §2.4 / §2.10 rows are stale. The audit verdict in §6 is unchanged: HEAD is audit-clean for the 2026-05-15 firing.
+
+### Addendum — freeze-override slice (2026-05-12 AM, PM)
+
+User reviewed the four pending guardian-flagged calls on 2026-05-12 AM and took the aggressive disposition on all four (vs the guardian's conservative recommendations). This addendum documents what changed, why, and what it means for the audit. **The K3NKe3Iu baseline is NOT re-anchored** — the audit catalogs additions as toolkit-originals and documents the D5 fix as resolved drift.
+
+**1. D5 fix — escalated to HIGH and resolved.**
+- User escalated D5 (topbar gradient drift) from MEDIUM to HIGH in the sign-off call and authorized pre-audit fix. Guardian's MEDIUM classification noted the strip still read violet and wordmark was legible; user's HIGH call read that pixel parity on the brand strip matters for an audit narrative.
+- `tokens.css` `--gradient-topbar` updated to `linear-gradient(90deg, #6b2bd9 0%, #7c3aed 38%, #8b5cf6 100%)` matching the K3NKe3Iu tarball spec on all three flagged axes (angle, light-mode end-stop, start-stop hex + mid-stop position). `--gradient-topbar-dark` angle synced to 90deg for theme coherence; dark colors unchanged (audit did not flag them).
+- D5 row in §4 above marked struck-through + RESOLVED.
+
+**2. v1-archive cull — pulled forward from Sprint B0-1.**
+- User pulled forward the v1-archive deletion from post-audit (Sprint B0-1, 5/18+) into the pre-audit window. Rationale: archive is not mounted by any production code path, so deletion is freeze-tolerable (no rendered surface change). Removes 3,842 lines from the audit subject.
+- Deleted: `components/views/views-{1,2,3,meta,new,oc}.tsx`, `components/{shell,icons,tweaks-panel}.tsx` (root-level legacy), `app/styles/styles.css`. `components/views/` directory auto-removed when empty.
+- Verification: build + smoke green post-cull. Zero mounted-file imports referenced any of the deleted paths (verified by repo-wide grep prior to deletion).
+- **Audit implication:** the §2 surface-by-surface table rows that referenced the legacy v1 files (the "port-leads-tarball" cells citing `styles.css` lines 244–246) point to a now-deleted file. They remain in the audit doc as historical context for the design-tarball-shipped values that the port corrected; they are not stale findings, they are pre-cull observations.
+
+**3. B0-8 Work Products UI surface — pulled forward from post-audit.**
+- User pulled forward Sprint B0 item B0-8 from post-audit (5/18+) into the pre-audit window with explicit freeze override (same shape as the K3NKe3Iu shell redesign override 2026-05-11 PM).
+- Three new view surfaces shipped: WorkProductsKanbanPage (`#workproducts`), WorkProductDetailPage (`#workproducts/<id>`), and the new leftmost WorkProductsTab on CapabilityDetailPage. Catalogued as toolkit-originals **#9, #10, #11** in §3 above.
+- Files added: `components/v2/workproducts.tsx` (~330 lines), `app/styles/workproducts.css` (~240 lines), `.claude/agent-memory/lead-developer/project_b08_workproducts_views.md` (memory entry).
+- Files modified: `components/v2/detail.tsx` (+95 lines for the tab + `WorkProductsTab` component), `app/page.tsx` (+6 lines for two new route handlers), `components/v2/icons.tsx` (+2 lines for the workproducts icon), `components/v2/shell.tsx` (+1 line for the RAIL_TOP entry), `app/styles/v2.css` (+1 line for the @import).
+- Known shipping debt: drag-to-change-state and real state mutations deferred to Stance B Sprint B1 (state writes need Drizzle); state-change controls fire `notImplemented` toast with explicit "Stance B B1" messaging. DRC deep-links land at `#decisions` inbox (no per-DRC route today).
+- Verification: `pnpm build` + `pnpm smoke` green; both `.theme-light` and `.theme-dark` render correctly on the new surfaces; existing routes (`#mywork`, `#capabilities/<capId>`, `#guides/<ocId>`) unaffected.
+
+**4. ProjectIdentityChip uniqueness — lock-in retired.**
+- User retired the prior "item 8 is the **only** allowed toolkit-tweak beyond the literal K3NKe3Iu design" lock-in language. Beyond-design additions are now classified as toolkit-originals and catalogued in the originals memo rather than treated as audit blockers.
+- Items 9–11 land under this relaxed policy. Future additions follow the same path: catalogue them in `.claude/agent-memory/design-fidelity-guardian/project_toolkit_original_additions.md`, surface in the audit doc, no special user-authorization step required.
+
+**Audit posture under this slice.**
+
+The K3NKe3Iu baseline stays. The audit firing on 2026-05-15 documents:
+- 11 catalogued toolkit-originals (was 8; items 9–11 from this slice).
+- D5 RESOLVED (was MEDIUM; now strike-through in §4).
+- v1-archive removed from subject (deleted, no parity claim possible against deleted files).
+- D1–D4 still HIGH, still queued for Sprint B0-3 (not pulled forward in this slice; they're true drift requiring more careful fixes).
+- C1–C5, C7, C10–C13 still LOW, still deferred to Sprint B0-3.
+
+The audit narrative shifts slightly: it is no longer "did the port match the design?" but "did the port match the design plus document the deliberate additions?" The toolkit-originals memo carries the narrative weight for items beyond the literal design.
 
 ### Port-leads-tarball corrections (NOT drift — port is more accurate than tarball)
 
@@ -272,26 +315,29 @@ All the following landed before this audit fires. Smoke passed at the audit-inpu
 
 | Role | Sign-off | Note |
 |---|---|---|
-| design-fidelity-guardian | ✓ (K3NKe3Iu re-pass, 2026-05-11 PM) | §2.6 + §2.9 re-derived against `K3NKe3IuvfS03Mr6yWnkDw`. D1–D4 re-confirmed at HEAD `8902109`. D5 added (violet topbar gradient). C6 retired, C8 mooted. Items 7–8 added to toolkit-originals memo. |
-| chief-architect | pending user approval | Architectural classifications confirmed for the new shell slice |
-| user | pending | Confirm: (a) D5 is MEDIUM not HIGH (audit-tolerable but Sprint B0-3 fix), (b) item 8 (ProjectIdentityChip) is the only allowed toolkit-tweak beyond the literal K3NKe3Iu design, (c) re-anchor v1 archive deletion still queued for post-audit. |
+| design-fidelity-guardian | ✓ (K3NKe3Iu re-pass, 2026-05-11 PM) | §2.6 + §2.9 re-derived against `K3NKe3IuvfS03Mr6yWnkDw`. D1–D4 re-confirmed at HEAD `8902109`. D5 added (violet topbar gradient; **resolved 2026-05-12**, see addendum). C6 retired, C8 mooted. Items 7–11 added to toolkit-originals memo. |
+| chief-architect | ✓ (2026-05-12 AM) | Architectural classifications confirmed for new shell slice + freeze-override slice. Path B decision logged at `.claude/agent-memory/chief-architect/project_workproducts_path_b_decision_2026_05_12.md`. |
+| user | ✓ (2026-05-12 AM) | Four-call sign-off: (a) D5 escalated to HIGH and fixed pre-audit; (b) ProjectIdentityChip uniqueness lock-in **retired** — beyond-design additions classified as toolkit-originals going forward; (c) v1-archive cull **pulled forward** out of audit subject; (d) B0-8 Work Products surface **pulled forward** with freeze override, lands as toolkit-originals 9–11 with no re-baseline. See addendum "Freeze-override slice (2026-05-12)". |
 
 ### 6.1 Audit-readiness verdict for the 2026-05-15 firing
 
-**HEAD `8902109` is AUDIT-CLEAN at the K3NKe3Iu baseline** with caveats:
+**HEAD is AUDIT-CLEAN at the K3NKe3Iu baseline** with caveats:
 
-- All HIGH drift (D1–D4) is **acknowledged and queued for Sprint B0-3**, not a blocker for the audit firing — an audit that acknowledges its own drift is honest, not failing.
-- D5 (violet topbar gradient drift) is MEDIUM, not pilot-blocking. The strip reads violet, the wordmark is legible inverted-white in both themes, and Janet can navigate. Worth fixing for parity but does not block.
-- No regressions vs. the prior `CgM4C5b7` pass. Shell-redesign implementation is sound: ProjectContextBar wires correctly, ProjectIdentityChip surfaces on the right routes, all toolkit-originals are catalogued.
-- No new architecturally-significant drift surfaced by the new tarball — the only structural changes are the shell-shape changes the user already authorized and the port has already implemented.
+- All HIGH drift D1–D4 is **acknowledged and queued for Sprint B0-3**, not a blocker for the audit firing — an audit that acknowledges its own drift is honest, not failing.
+- D5 was the only MEDIUM and is **RESOLVED** as of 2026-05-12 (see addendum). Gradient now matches tarball spec on all three flagged axes.
+- v1-archive (~3,842 legacy lines in `components/views/*`, root-level legacy components, `app/styles/styles.css`) is **deleted** as of 2026-05-12. Removed from audit subject.
+- 11 toolkit-originals catalogued (was 8; items 9–11 added 2026-05-12 from the B0-8 Work Products surface pull-forward). The originals memo carries the narrative for beyond-design additions; no per-item user authorization required going forward.
+- No regressions vs. the prior `CgM4C5b7` pass. Shell-redesign implementation is sound. New WP surfaces verified on `pnpm build` + `pnpm smoke` in both themes.
+- No new architecturally-significant drift surfaced by the new tarball or the freeze-override slice — the structural additions (shell redesign, Work Products surface) are user-authorized and catalogued.
 
 ### 6.2 `v0.2.0-pre-audit` tag readiness for the 2026-05-13 EOD freeze SHA
 
 `release-manager` may cut `v0.2.0-pre-audit` at the SHA frozen 2026-05-13 EOD with the following caveats explicitly named in the tag annotation:
 
-- The tag carries D1–D4 (pilot-blocking, queued for Sprint B0-3) and D5 (topbar gradient, queued for Sprint B0-3) as **known drift**, not regressions.
-- The tag carries 8 catalogued toolkit-originals; item 8 (ProjectIdentityChip) is the one product-owner-required tweak beyond the literal design.
-- The tag is the audit-input artifact, not a pilot-ready release. Sprint B0-3 closes D1–D5 + C1–C5 + C7 + C10–C13 before the pilot tag.
+- The tag carries D1–D4 (pilot-blocking, queued for Sprint B0-3) as **known drift**, not regressions. D5 is RESOLVED.
+- The tag carries 11 catalogued toolkit-originals (items 1–11 in §3). Items 9–11 are the B0-8 Work Products surface pulled forward from post-audit per the 2026-05-12 freeze-override slice.
+- v1-archive is deleted; the tag SHA does not contain the legacy v1 files.
+- The tag is the audit-input artifact, not a pilot-ready release. Sprint B0-3 closes D1–D4 + C1–C5 + C7 + C10–C13 before the pilot tag.
 
 **No issues identified that should block either the 2026-05-15 audit firing or the `v0.2.0-pre-audit` tag.**
 

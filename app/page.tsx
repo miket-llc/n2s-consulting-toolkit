@@ -12,6 +12,7 @@ import {
   MethodologyPage, AskPage, AutopilotPage, SettingsPage, GuidesPage,
 } from "@/components/v2/pages";
 import { CapabilityDetailPage, ConfigurationGuidePage } from "@/components/v2/detail";
+import { WorkProductsKanbanPage, WorkProductDetailPage } from "@/components/v2/workproducts";
 
 const LABELS: Record<string, string> = {
   mywork: "My work",
@@ -34,21 +35,23 @@ function Router() {
 
   if (!top || top === "home") return <PracticeHome/>;
   if (top === "project") return <ProjectHome/>;
-  if (top === "capabilities" && sub) return <CapabilityDetailPage capId={sub}/>;
-  if (top === "guides" && sub)       return <ConfigurationGuidePage ocId={sub}/>;
+  if (top === "capabilities" && sub)  return <CapabilityDetailPage capId={sub}/>;
+  if (top === "guides" && sub)        return <ConfigurationGuidePage ocId={sub}/>;
+  if (top === "workproducts" && sub)  return <WorkProductDetailPage wpId={sub}/>;
 
   switch (top) {
-    case "mywork":       return <MyWorkPage/>;
-    case "decisions":    return <DecisionsPage/>;
-    case "guides":       return <GuidesPage/>;
-    case "capabilities": return <CapabilitiesPage/>;
-    case "schedule":     return <SchedulePage/>;
-    case "workshops":    return <WorkshopsPage/>;
-    case "library":      return <MethodologyPage/>;
-    case "ai":           return <AskPage/>;
-    case "autopilot":    return <AutopilotPage/>;
-    case "settings":     return <SettingsPage/>;
-    default:             return <Coming name={LABELS[top] || top}/>;
+    case "mywork":        return <MyWorkPage/>;
+    case "decisions":     return <DecisionsPage/>;
+    case "guides":        return <GuidesPage/>;
+    case "capabilities":  return <CapabilitiesPage/>;
+    case "schedule":      return <SchedulePage/>;
+    case "workshops":     return <WorkshopsPage/>;
+    case "library":       return <MethodologyPage/>;
+    case "ai":            return <AskPage/>;
+    case "autopilot":     return <AutopilotPage/>;
+    case "settings":      return <SettingsPage/>;
+    case "workproducts":  return <WorkProductsKanbanPage/>;
+    default:              return <Coming name={LABELS[top] || top}/>;
   }
 }
 

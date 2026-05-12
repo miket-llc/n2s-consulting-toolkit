@@ -7,7 +7,7 @@ export type IconName =
   | "chevron-left" | "chevron-right" | "chevron-down" | "arrow-right" | "arrow-up-right" | "external"
   | "check" | "x" | "plus" | "minus" | "warn" | "alert" | "bolt" | "refresh" | "info"
   | "spark" | "play" | "filter" | "clock" | "user" | "users" | "book" | "send"
-  | "sparkle" | "more" | "command";
+  | "sparkle" | "more" | "command" | "workproducts";
 
 export type IconProps = {
   name: IconName;
@@ -70,6 +70,7 @@ export function Icon({ name, size = 18, stroke = 1.5, style }: IconProps) {
     case "send": return <svg {...props}><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>;
     case "more": return <svg {...props}><circle cx="6" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18" cy="12" r="1.5"/></svg>;
     case "command": return <svg {...props}><path d="M9 6V4.5a2 2 0 10-2 2H9zM15 6V4.5a2 2 0 112 2H15zM9 18v1.5a2 2 0 11-2-2H9zM15 18v1.5a2 2 0 102-2H15z"/><path d="M9 6h6v12H9z"/></svg>;
+    case "workproducts": return <svg {...props}><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg>;
     default: return null;
   }
 }

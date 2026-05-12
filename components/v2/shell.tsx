@@ -516,9 +516,10 @@ type RailEntry = {
 };
 
 const RAIL_TOP: RailEntry[] = [
-  { id: "",        label: "Portfolio", icon: "grid" },
-  { id: "project", label: "Project",   icon: "home" },
-  { id: "mywork",  label: "My work",   icon: "inbox", count: 5 },
+  { id: "",              label: "Portfolio",     icon: "grid" },
+  { id: "project",       label: "Project",       icon: "home" },
+  { id: "mywork",        label: "My work",       icon: "inbox", count: 5 },
+  { id: "workproducts",  label: "Work Products", icon: "workproducts" },
 ];
 
 const RAIL_BOTTOM: RailEntry[] = [
